@@ -1191,12 +1191,12 @@ static size_t do_compat_readv(compat_ulong_t fd,
 
 }
 
-COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
-		const struct compat_iovec __user *,vec,
-		compat_ulong_t, vlen)
-{
-	return do_compat_readv(fd, vec, vlen, 0);
-}
+//////COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		compat_ulong_t, vlen)
+//////{
+//////	return do_compat_readv(fd, vec, vlen, 0);
+//////}
 
 static long do_compat_preadv64(unsigned long fd,
 				  const struct compat_iovec __user *vec,
@@ -1226,39 +1226,39 @@ COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
 }
 #endif
 /*
-COMPAT_SYSCALL_DEFINE5(preadv, compat_ulong_t, fd,
-		const struct compat_iovec __user *,vec,
-		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
-{
-	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
-
-	return do_compat_preadv64(fd, vec, vlen, pos, 0);
-}
+//////COMPAT_SYSCALL_DEFINE5(preadv, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
+//////{
+//////	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+//////
+//////	return do_compat_preadv64(fd, vec, vlen, pos, 0);
+//////}
 */
 #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64V2
-COMPAT_SYSCALL_DEFINE5(preadv64v2, unsigned long, fd,
-		const struct compat_iovec __user *,vec,
-		unsigned long, vlen, loff_t, pos, rwf_t, flags)
-{
-	if (pos == -1)
-		return do_compat_readv(fd, vec, vlen, flags);
-
-	return do_compat_preadv64(fd, vec, vlen, pos, flags);
-}
+//////COMPAT_SYSCALL_DEFINE5(preadv64v2, unsigned long, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		unsigned long, vlen, loff_t, pos, rwf_t, flags)
+//////{
+//////	if (pos == -1)
+//////		return do_compat_readv(fd, vec, vlen, flags);
+//////
+//////	return do_compat_preadv64(fd, vec, vlen, pos, flags);
+//////}
 #endif
 /*
-COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
-		const struct compat_iovec __user *,vec,
-		compat_ulong_t, vlen, u32, pos_low, u32, pos_high,
-		rwf_t, flags)
-{
-	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
-
-	if (pos == -1)
-		return do_compat_readv(fd, vec, vlen, flags);
-
-	return do_compat_preadv64(fd, vec, vlen, pos, flags);
-}
+//////COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		compat_ulong_t, vlen, u32, pos_low, u32, pos_high,
+//////		rwf_t, flags)
+//////{
+//////	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+//////
+//////	if (pos == -1)
+//////		return do_compat_readv(fd, vec, vlen, flags);
+//////
+//////	return do_compat_preadv64(fd, vec, vlen, pos, flags);
+//////}
 */
 static size_t compat_writev(struct file *file,
 			    const struct compat_iovec __user *vec,
@@ -1300,12 +1300,12 @@ static size_t do_compat_writev(compat_ulong_t fd,
 	return ret;
 }
 /*
-COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
-		const struct compat_iovec __user *, vec,
-		compat_ulong_t, vlen)
-{
-	return do_compat_writev(fd, vec, vlen, 0);
-}
+//////COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *, vec,
+//////		compat_ulong_t, vlen)
+//////{
+//////	return do_compat_writev(fd, vec, vlen, 0);
+//////}
 */
 static long do_compat_pwritev64(unsigned long fd,
 				   const struct compat_iovec __user *vec,
@@ -1335,38 +1335,38 @@ COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
 }
 #endif
 /*
-COMPAT_SYSCALL_DEFINE5(pwritev, compat_ulong_t, fd,
-		const struct compat_iovec __user *,vec,
-		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
-{
-	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
-
-	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
-}
+//////COMPAT_SYSCALL_DEFINE5(pwritev, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		compat_ulong_t, vlen, u32, pos_low, u32, pos_high)
+//////{
+//////	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+//////
+//////	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
+//////}
 */
 #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64V2
-COMPAT_SYSCALL_DEFINE5(pwritev64v2, unsigned long, fd,
-		const struct compat_iovec __user *,vec,
-		unsigned long, vlen, loff_t, pos, rwf_t, flags)
-{
-	if (pos == -1)
-		return do_compat_writev(fd, vec, vlen, flags);
-
-	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
-}
+//////COMPAT_SYSCALL_DEFINE5(pwritev64v2, unsigned long, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		unsigned long, vlen, loff_t, pos, rwf_t, flags)
+//////{
+//////	if (pos == -1)
+//////		return do_compat_writev(fd, vec, vlen, flags);
+//////
+//////	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
+//////}
 #endif
 /*
-COMPAT_SYSCALL_DEFINE6(pwritev2, compat_ulong_t, fd,
-		const struct compat_iovec __user *,vec,
-		compat_ulong_t, vlen, u32, pos_low, u32, pos_high, rwf_t, flags)
-{
-	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
-
-	if (pos == -1)
-		return do_compat_writev(fd, vec, vlen, flags);
-
-	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
-}
+//////COMPAT_SYSCALL_DEFINE6(pwritev2, compat_ulong_t, fd,
+//////		const struct compat_iovec __user *,vec,
+//////		compat_ulong_t, vlen, u32, pos_low, u32, pos_high, rwf_t, flags)
+//////{
+//////	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+//////
+//////	if (pos == -1)
+//////		return do_compat_writev(fd, vec, vlen, flags);
+//////
+//////	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
+//////}
 */
 #endif
 
