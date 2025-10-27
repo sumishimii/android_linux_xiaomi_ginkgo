@@ -11,9 +11,6 @@
  * GNU General Public License for more details.
  */
 #include <dt-bindings/thermal/thermal.h>
-#define THERMAL_LIMIT_MINUS_1  (THERMAL_MAX_LIMIT - 1)
-#define THERMAL_LIMIT_MINUS_5  (THERMAL_MAX_LIMIT - 5)
-#define THERMAL_LIMIT_MINUS_6  (THERMAL_MAX_LIMIT - 6)
 
 &thermal_zones {
 	pmi632-tz {
