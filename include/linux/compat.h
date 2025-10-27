@@ -346,20 +346,20 @@ asmlinkage long compat_sys_keyctl(u32 option,
 			      u32 arg2, u32 arg3, u32 arg4, u32 arg5);
 asmlinkage long compat_sys_ustat(unsigned dev, struct compat_ustat __user *u32);
 
-asmlinkage ssize_t compat_sys_readv(compat_ulong_t fd,
+asmlinkage long compat_sys_readv(compat_ulong_t fd,
 		const struct compat_iovec __user *vec, compat_ulong_t vlen);
-asmlinkage ssize_t compat_sys_writev(compat_ulong_t fd,
+asmlinkage long compat_sys_writev(compat_ulong_t fd,
 		const struct compat_iovec __user *vec, compat_ulong_t vlen);
-asmlinkage ssize_t compat_sys_preadv(compat_ulong_t fd,
+asmlinkage long compat_sys_preadv(compat_ulong_t fd,
 		const struct compat_iovec __user *vec,
 		compat_ulong_t vlen, u32 pos_low, u32 pos_high);
-asmlinkage ssize_t compat_sys_pwritev(compat_ulong_t fd,
+asmlinkage long compat_sys_pwritev(compat_ulong_t fd,
 		const struct compat_iovec __user *vec,
 		compat_ulong_t vlen, u32 pos_low, u32 pos_high);
-asmlinkage ssize_t compat_sys_preadv2(compat_ulong_t fd,
+asmlinkage long compat_sys_preadv2(compat_ulong_t fd,
 		const struct compat_iovec __user *vec,
 		compat_ulong_t vlen, u32 pos_low, u32 pos_high, rwf_t flags);
-asmlinkage ssize_t compat_sys_pwritev2(compat_ulong_t fd,
+asmlinkage long compat_sys_pwritev2(compat_ulong_t fd,
 		const struct compat_iovec __user *vec,
 		compat_ulong_t vlen, u32 pos_low, u32 pos_high, rwf_t flags);
 
@@ -685,7 +685,7 @@ asmlinkage long compat_sys_mq_timedsend(mqd_t mqdes,
 			const char __user *u_msg_ptr,
 			compat_size_t msg_len, unsigned int msg_prio,
 			const struct compat_timespec __user *u_abs_timeout);
-asmlinkage ssize_t compat_sys_mq_timedreceive(mqd_t mqdes,
+asmlinkage long compat_sys_mq_timedreceive(mqd_t mqdes,
 			char __user *u_msg_ptr,
 			compat_size_t msg_len, unsigned int __user *u_msg_prio,
 			const struct compat_timespec __user *u_abs_timeout);
@@ -700,11 +700,11 @@ extern ssize_t compat_rw_copy_check_uvector(int type,
 
 extern void __user *compat_alloc_user_space(unsigned long len);
 
-asmlinkage ssize_t compat_sys_process_vm_readv(compat_pid_t pid,
+asmlinkage long compat_sys_process_vm_readv(compat_pid_t pid,
 		const struct compat_iovec __user *lvec,
 		compat_ulong_t liovcnt, const struct compat_iovec __user *rvec,
 		compat_ulong_t riovcnt, compat_ulong_t flags);
-asmlinkage ssize_t compat_sys_process_vm_writev(compat_pid_t pid,
+asmlinkage long compat_sys_process_vm_writev(compat_pid_t pid,
 		const struct compat_iovec __user *lvec,
 		compat_ulong_t liovcnt, const struct compat_iovec __user *rvec,
 		compat_ulong_t riovcnt, compat_ulong_t flags);
