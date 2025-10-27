@@ -1518,8 +1518,8 @@ COMPAT_SYSCALL_DEFINE5(mq_timedsend, mqd_t, mqdes,
 //			return res;
 //		p = &ts;
 //	}
-	return do_mq_timedreceive(mqdes, u_msg_ptr, msg_len, u_msg_prio, p);
-}
+//	return do_mq_timedreceive(mqdes, u_msg_ptr, msg_len, u_msg_prio, p);
+//}
 
 COMPAT_SYSCALL_DEFINE2(mq_notify, mqd_t, mqdes,
 		       const struct compat_sigevent __user *, u_notification)
