@@ -10,6 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+#include "../../qcom/trinket.dtsi"
 #include <dt-bindings/thermal/thermal.h>
 
 &thermal_zones {
