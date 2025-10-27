@@ -298,31 +298,31 @@ SYSCALL_DEFINE3(signalfd, int, ufd, sigset_t __user *, user_mask,
 }
 
 #ifdef CONFIG_COMPAT
-COMPAT_SYSCALL_DEFINE4(signalfd4, int, ufd,
-		     const compat_sigset_t __user *,sigmask,
-		     compat_size_t, sigsetsize,
-		     int, flags)
-{
-	compat_sigset_t ss32;
-	sigset_t tmp;
-	sigset_t __user *ksigmask;
+//COMPAT_SYSCALL_DEFINE4(signalfd4, int, ufd,
+//		     const compat_sigset_t __user *,sigmask,
+//		     compat_size_t, sigsetsize,
+//		     int, flags)
+//{
+//	compat_sigset_t ss32;
+//	sigset_t tmp;
+//	sigset_t __user *ksigmask;
+//
+//	if (sigsetsize != sizeof(compat_sigset_t))
+//		return -EINVAL;
+//	if (copy_from_user(&ss32, sigmask, sizeof(ss32)))
+//		return -EFAULT;
+//	sigset_from_compat(&tmp, &ss32);
+//	ksigmask = compat_alloc_user_space(sizeof(sigset_t));
+//	if (copy_to_user(ksigmask, &tmp, sizeof(sigset_t)))
+//		return -EFAULT;
+//
+//	return sys_signalfd4(ufd, ksigmask, sizeof(sigset_t), flags);
+//}
 
-	if (sigsetsize != sizeof(compat_sigset_t))
-		return -EINVAL;
-	if (copy_from_user(&ss32, sigmask, sizeof(ss32)))
-		return -EFAULT;
-	sigset_from_compat(&tmp, &ss32);
-	ksigmask = compat_alloc_user_space(sizeof(sigset_t));
-	if (copy_to_user(ksigmask, &tmp, sizeof(sigset_t)))
-		return -EFAULT;
-
-	return sys_signalfd4(ufd, ksigmask, sizeof(sigset_t), flags);
-}
-
-COMPAT_SYSCALL_DEFINE3(signalfd, int, ufd,
-		     const compat_sigset_t __user *,sigmask,
-		     compat_size_t, sigsetsize)
-{
-	return compat_sys_signalfd4(ufd, sigmask, sigsetsize, 0);
-}
+//COMPAT_SYSCALL_DEFINE3(signalfd, int, ufd,
+//		     const compat_sigset_t __user *,sigmask,
+//		     compat_size_t, sigsetsize)
+//{
+//	return compat_sys_signalfd4(ufd, sigmask, sigsetsize, 0);
+//}
 #endif

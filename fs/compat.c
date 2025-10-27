@@ -157,49 +157,49 @@ static int do_nfs4_super_data_conv(void *raw_data)
 #define NCPFS_NAME      "ncpfs"
 #define NFS4_NAME	"nfs4"
 
-COMPAT_SYSCALL_DEFINE5(mount, const char __user *, dev_name,
-		       const char __user *, dir_name,
-		       const char __user *, type, compat_ulong_t, flags,
-		       const void __user *, data)
-{
-	char *kernel_type;
-	void *options;
-	char *kernel_dev;
-	int retval;
-
-	kernel_type = copy_mount_string(type);
-	retval = PTR_ERR(kernel_type);
-	if (IS_ERR(kernel_type))
-		goto out;
-
-	kernel_dev = copy_mount_string(dev_name);
-	retval = PTR_ERR(kernel_dev);
-	if (IS_ERR(kernel_dev))
-		goto out1;
-
-	options = copy_mount_options(data);
-	retval = PTR_ERR(options);
-	if (IS_ERR(options))
-		goto out2;
-
-	if (kernel_type && options) {
-		if (!strcmp(kernel_type, NCPFS_NAME)) {
-			do_ncp_super_data_conv(options);
-		} else if (!strcmp(kernel_type, NFS4_NAME)) {
-			retval = -EINVAL;
-			if (do_nfs4_super_data_conv(options))
-				goto out3;
-		}
-	}
-
-	retval = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
-
- out3:
-	kfree(options);
- out2:
-	kfree(kernel_dev);
- out1:
-	kfree(kernel_type);
- out:
-	return retval;
-}
+//COMPAT_SYSCALL_DEFINE5(mount, const char __user *, dev_name,
+//		       const char __user *, dir_name,
+//		       const char __user *, type, compat_ulong_t, flags,
+//		       const void __user *, data)
+//{
+//	char *kernel_type;
+//	void *options;
+//	char *kernel_dev;
+//	int retval;
+//
+//	kernel_type = copy_mount_string(type);
+//	retval = PTR_ERR(kernel_type);
+//	if (IS_ERR(kernel_type))
+//		goto out;
+//
+//	kernel_dev = copy_mount_string(dev_name);
+//	retval = PTR_ERR(kernel_dev);
+//	if (IS_ERR(kernel_dev))
+//		goto out1;
+//
+//	options = copy_mount_options(data);
+//	retval = PTR_ERR(options);
+//	if (IS_ERR(options))
+//		goto out2;
+//
+//	if (kernel_type && options) {
+//		if (!strcmp(kernel_type, NCPFS_NAME)) {
+//			do_ncp_super_data_conv(options);
+//		} else if (!strcmp(kernel_type, NFS4_NAME)) {
+//			retval = -EINVAL;
+//			if (do_nfs4_super_data_conv(options))
+//				goto out3;
+//		}
+//	}
+//
+//	retval = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
+//
+// out3:
+//	kfree(options);
+// out2:
+//	kfree(kernel_dev);
+// out1:
+//	kfree(kernel_type);
+// out:
+//	return retval;
+//}

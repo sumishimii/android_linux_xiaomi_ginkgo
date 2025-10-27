@@ -638,47 +638,47 @@ static int copy_compat_msqid_to_user(void __user *buf, struct msqid64_ds *in,
 	}
 }
 
-COMPAT_SYSCALL_DEFINE3(msgctl, int, msqid, int, cmd, void __user *, uptr)
-{
-	struct ipc_namespace *ns;
-	int err;
-	struct msqid64_ds msqid64;
-	int version = compat_ipc_parse_version(&cmd);
-
-	ns = current->nsproxy->ipc_ns;
-
-	if (msqid < 0 || cmd < 0)
-		return -EINVAL;
-
-	switch (cmd & (~IPC_64)) {
-	case IPC_INFO:
-	case MSG_INFO: {
-		struct msginfo msginfo;
-		err = msgctl_info(ns, msqid, cmd, &msginfo);
-		if (err < 0)
-			return err;
-		if (copy_to_user(uptr, &msginfo, sizeof(struct msginfo)))
-			err = -EFAULT;
-		return err;
-	}
-	case IPC_STAT:
-	case MSG_STAT:
-		err = msgctl_stat(ns, msqid, cmd, &msqid64);
-		if (err < 0)
-			return err;
-		if (copy_compat_msqid_to_user(uptr, &msqid64, version))
-			err = -EFAULT;
-		return err;
-	case IPC_SET:
-		if (copy_compat_msqid_from_user(&msqid64, uptr, version))
-			return -EFAULT;
-		/* fallthru */
-	case IPC_RMID:
-		return msgctl_down(ns, msqid, cmd, &msqid64);
-	default:
-		return -EINVAL;
-	}
-}
+//COMPAT_SYSCALL_DEFINE3(msgctl, int, msqid, int, cmd, void __user *, uptr)
+//{
+//	struct ipc_namespace *ns;
+//	int err;
+//	struct msqid64_ds msqid64;
+//	int version = compat_ipc_parse_version(&cmd);
+//
+//	ns = current->nsproxy->ipc_ns;
+//
+//	if (msqid < 0 || cmd < 0)
+//		return -EINVAL;
+//
+//	switch (cmd & (~IPC_64)) {
+//	case IPC_INFO:
+//	case MSG_INFO: {
+//		struct msginfo msginfo;
+//		err = msgctl_info(ns, msqid, cmd, &msginfo);
+//		if (err < 0)
+//			return err;
+//		if (copy_to_user(uptr, &msginfo, sizeof(struct msginfo)))
+//			err = -EFAULT;
+//		return err;
+//	}
+//	case IPC_STAT:
+//	case MSG_STAT:
+//		err = msgctl_stat(ns, msqid, cmd, &msqid64);
+//		if (err < 0)
+//			return err;
+//		if (copy_compat_msqid_to_user(uptr, &msqid64, version))
+//			err = -EFAULT;
+//		return err;
+//	case IPC_SET:
+//		if (copy_compat_msqid_from_user(&msqid64, uptr, version))
+//			return -EFAULT;
+//		/* fallthru */
+//	case IPC_RMID:
+//		return msgctl_down(ns, msqid, cmd, &msqid64);
+//	default:
+//		return -EINVAL;
+//	}
+//}
 #endif
 
 static int testmsg(struct msg_msg *msg, long type, int mode)
@@ -861,16 +861,16 @@ struct compat_msgbuf {
 	char mtext[1];
 };
 
-COMPAT_SYSCALL_DEFINE4(msgsnd, int, msqid, compat_uptr_t, msgp,
-		       compat_ssize_t, msgsz, int, msgflg)
-{
-	struct compat_msgbuf __user *up = compat_ptr(msgp);
-	compat_long_t mtype;
-
-	if (get_user(mtype, &up->mtype))
-		return -EFAULT;
-	return do_msgsnd(msqid, mtype, up->mtext, (ssize_t)msgsz, msgflg);
-}
+//COMPAT_SYSCALL_DEFINE4(msgsnd, int, msqid, compat_uptr_t, msgp,
+//		       compat_ssize_t, msgsz, int, msgflg)
+//{
+//	struct compat_msgbuf __user *up = compat_ptr(msgp);
+//	compat_long_t mtype;
+//
+//	if (get_user(mtype, &up->mtype))
+//		return -EFAULT;
+//	return do_msgsnd(msqid, mtype, up->mtext, (ssize_t)msgsz, msgflg);
+//}
 #endif
 
 static inline int convert_mode(long *msgtyp, int msgflg)
@@ -1148,12 +1148,12 @@ static long compat_do_msg_fill(void __user *dest, struct msg_msg *msg, size_t bu
 	return msgsz;
 }
 
-COMPAT_SYSCALL_DEFINE5(msgrcv, int, msqid, compat_uptr_t, msgp,
-		       compat_ssize_t, msgsz, compat_long_t, msgtyp, int, msgflg)
-{
-	return do_msgrcv(msqid, compat_ptr(msgp), (ssize_t)msgsz, (long)msgtyp,
-			 msgflg, compat_do_msg_fill);
-}
+//COMPAT_SYSCALL_DEFINE5(msgrcv, int, msqid, compat_uptr_t, msgp,
+//		       compat_ssize_t, msgsz, compat_long_t, msgtyp, int, msgflg)
+//{
+//	return do_msgrcv(msqid, compat_ptr(msgp), (ssize_t)msgsz, (long)msgtyp,
+//			 msgflg, compat_do_msg_fill);
+//}
 #endif
 
 int msg_init_ns(struct ipc_namespace *ns)

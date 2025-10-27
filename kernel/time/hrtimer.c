@@ -1633,22 +1633,22 @@ SYSCALL_DEFINE2(nanosleep, struct timespec __user *, rqtp,
 
 #ifdef CONFIG_COMPAT
 
-COMPAT_SYSCALL_DEFINE2(nanosleep, struct compat_timespec __user *, rqtp,
-		       struct compat_timespec __user *, rmtp)
-{
-	struct timespec64 tu;
-
-	if (compat_get_timespec64(&tu, rqtp))
-		return -EFAULT;
-
-	if (!timespec64_valid(&tu))
-		return -EINVAL;
-
-	current->restart_block.fn = do_no_restart_syscall;
-	current->restart_block.nanosleep.type = rmtp ? TT_COMPAT : TT_NONE;
-	current->restart_block.nanosleep.compat_rmtp = rmtp;
-	return hrtimer_nanosleep(&tu, HRTIMER_MODE_REL, CLOCK_MONOTONIC);
-}
+//COMPAT_SYSCALL_DEFINE2(nanosleep, struct compat_timespec __user *, rqtp,
+//		       struct compat_timespec __user *, rmtp)
+//{
+//	struct timespec64 tu;
+//
+//	if (compat_get_timespec64(&tu, rqtp))
+//		return -EFAULT;
+//
+//	if (!timespec64_valid(&tu))
+//		return -EINVAL;
+//
+//	current->restart_block.fn = do_no_restart_syscall;
+//	current->restart_block.nanosleep.type = rmtp ? TT_COMPAT : TT_NONE;
+//	current->restart_block.nanosleep.compat_rmtp = rmtp;
+//	return hrtimer_nanosleep(&tu, HRTIMER_MODE_REL, CLOCK_MONOTONIC);
+//}
 #endif
 
 /*

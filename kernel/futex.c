@@ -4069,88 +4069,88 @@ static void compat_exit_robust_list(struct task_struct *curr)
 	}
 }
 
-COMPAT_SYSCALL_DEFINE2(set_robust_list,
-		struct compat_robust_list_head __user *, head,
-		compat_size_t, len)
-{
-	if (!futex_cmpxchg_enabled)
-		return -ENOSYS;
+//COMPAT_SYSCALL_DEFINE2(set_robust_list,
+//		struct compat_robust_list_head __user *, head,
+//		compat_size_t, len)
+//{
+//	if (!futex_cmpxchg_enabled)
+//		return -ENOSYS;
+//
+//	if (unlikely(len != sizeof(*head)))
+//		return -EINVAL;
+//
+//	current->compat_robust_list = head;
+//
+//	return 0;
+//}
 
-	if (unlikely(len != sizeof(*head)))
-		return -EINVAL;
+//COMPAT_SYSCALL_DEFINE3(get_robust_list, int, pid,
+//			compat_uptr_t __user *, head_ptr,
+//			compat_size_t __user *, len_ptr)
+//{
+//	struct compat_robust_list_head __user *head;
+//	unsigned long ret;
+//	struct task_struct *p;
+//
+//	if (!futex_cmpxchg_enabled)
+//		return -ENOSYS;
+//
+//	rcu_read_lock();
+//
+//	ret = -ESRCH;
+//	if (!pid)
+//		p = current;
+//	else {
+//		p = find_task_by_vpid(pid);
+//		if (!p)
+//			goto err_unlock;
+//	}
+//
+//	ret = -EPERM;
+//	if (!ptrace_may_access(p, PTRACE_MODE_READ_REALCREDS))
+//		goto err_unlock;
+//
+//	head = p->compat_robust_list;
+//	rcu_read_unlock();
+//
+//	if (put_user(sizeof(*head), len_ptr))
+//		return -EFAULT;
+//	return put_user(ptr_to_compat(head), head_ptr);
+//
+//err_unlock:
+//	rcu_read_unlock();
+//
+//	return ret;
+//}
 
-	current->compat_robust_list = head;
-
-	return 0;
-}
-
-COMPAT_SYSCALL_DEFINE3(get_robust_list, int, pid,
-			compat_uptr_t __user *, head_ptr,
-			compat_size_t __user *, len_ptr)
-{
-	struct compat_robust_list_head __user *head;
-	unsigned long ret;
-	struct task_struct *p;
-
-	if (!futex_cmpxchg_enabled)
-		return -ENOSYS;
-
-	rcu_read_lock();
-
-	ret = -ESRCH;
-	if (!pid)
-		p = current;
-	else {
-		p = find_task_by_vpid(pid);
-		if (!p)
-			goto err_unlock;
-	}
-
-	ret = -EPERM;
-	if (!ptrace_may_access(p, PTRACE_MODE_READ_REALCREDS))
-		goto err_unlock;
-
-	head = p->compat_robust_list;
-	rcu_read_unlock();
-
-	if (put_user(sizeof(*head), len_ptr))
-		return -EFAULT;
-	return put_user(ptr_to_compat(head), head_ptr);
-
-err_unlock:
-	rcu_read_unlock();
-
-	return ret;
-}
-
-COMPAT_SYSCALL_DEFINE6(futex, u32 __user *, uaddr, int, op, u32, val,
-		struct compat_timespec __user *, utime, u32 __user *, uaddr2,
-		u32, val3)
-{
-	struct timespec ts;
-	ktime_t t, *tp = NULL;
-	int val2 = 0;
-	int cmd = op & FUTEX_CMD_MASK;
-
-	if (utime && (cmd == FUTEX_WAIT || cmd == FUTEX_LOCK_PI ||
-		      cmd == FUTEX_WAIT_BITSET ||
-		      cmd == FUTEX_WAIT_REQUEUE_PI)) {
-		if (compat_get_timespec(&ts, utime))
-			return -EFAULT;
-		if (!timespec_valid(&ts))
-			return -EINVAL;
-
-		t = timespec_to_ktime(ts);
-		if (cmd == FUTEX_WAIT)
-			t = ktime_add_safe(ktime_get(), t);
-		tp = &t;
-	}
-	if (cmd == FUTEX_REQUEUE || cmd == FUTEX_CMP_REQUEUE ||
-	    cmd == FUTEX_CMP_REQUEUE_PI || cmd == FUTEX_WAKE_OP)
-		val2 = (int) (unsigned long) utime;
-
-	return do_futex(uaddr, op, val, tp, uaddr2, val2, val3);
-}
+//COMPAT_SYSCALL_DEFINE6(futex, u32 __user *, uaddr, int, op, u32, val,
+//		struct compat_timespec __user *, utime, u32 __user *, uaddr2,
+//		u32, val3)
+//{
+//	struct timespec ts;
+//	ktime_t t, *tp = NULL;
+//	int val2 = 0;
+//	int cmd = op & FUTEX_CMD_MASK;
+//
+//	if (utime && (cmd == FUTEX_WAIT || cmd == FUTEX_LOCK_PI ||
+//		      cmd == FUTEX_WAIT_BITSET ||
+//		      cmd == FUTEX_WAIT_REQUEUE_PI)) {
+//		if (compat_get_timespec(&ts, utime))
+//			return -EFAULT;
+//		if (!timespec_valid(&ts))
+//			return -EINVAL;
+//
+//		t = timespec_to_ktime(ts);
+//		if (cmd == FUTEX_WAIT)
+//			t = ktime_add_safe(ktime_get(), t);
+//		tp = &t;
+//	}
+//	if (cmd == FUTEX_REQUEUE || cmd == FUTEX_CMP_REQUEUE ||
+//	    cmd == FUTEX_CMP_REQUEUE_PI || cmd == FUTEX_WAKE_OP)
+//		val2 = (int) (unsigned long) utime;
+//
+//	return do_futex(uaddr, op, val, tp, uaddr2, val2, val3);
+//}
 #endif /* CONFIG_COMPAT */
 
 static void __init futex_detect_cmpxchg(void)

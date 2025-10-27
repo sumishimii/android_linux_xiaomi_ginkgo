@@ -236,46 +236,46 @@ static inline void compat_sig_setmask(sigset_t *blocked, compat_sigset_word set)
 	memcpy(blocked->sig, &set, sizeof(set));
 }
 
-COMPAT_SYSCALL_DEFINE3(sigprocmask, int, how,
-		       compat_old_sigset_t __user *, nset,
-		       compat_old_sigset_t __user *, oset)
-{
-	old_sigset_t old_set, new_set;
-	sigset_t new_blocked;
-
-	old_set = current->blocked.sig[0];
-
-	if (nset) {
-		if (get_user(new_set, nset))
-			return -EFAULT;
-		new_set &= ~(sigmask(SIGKILL) | sigmask(SIGSTOP));
-
-		new_blocked = current->blocked;
-
-		switch (how) {
-		case SIG_BLOCK:
-			sigaddsetmask(&new_blocked, new_set);
-			break;
-		case SIG_UNBLOCK:
-			sigdelsetmask(&new_blocked, new_set);
-			break;
-		case SIG_SETMASK:
-			compat_sig_setmask(&new_blocked, new_set);
-			break;
-		default:
-			return -EINVAL;
-		}
-
-		set_current_blocked(&new_blocked);
-	}
-
-	if (oset) {
-		if (put_user(old_set, oset))
-			return -EFAULT;
-	}
-
-	return 0;
-}
+//COMPAT_SYSCALL_DEFINE3(sigprocmask, int, how,
+//		       compat_old_sigset_t __user *, nset,
+//		       compat_old_sigset_t __user *, oset)
+//{
+//	old_sigset_t old_set, new_set;
+//	sigset_t new_blocked;
+//
+//	old_set = current->blocked.sig[0];
+//
+//	if (nset) {
+//		if (get_user(new_set, nset))
+//			return -EFAULT;
+//		new_set &= ~(sigmask(SIGKILL) | sigmask(SIGSTOP));
+//
+//		new_blocked = current->blocked;
+//
+//		switch (how) {
+//		case SIG_BLOCK:
+//			sigaddsetmask(&new_blocked, new_set);
+//			break;
+//		case SIG_UNBLOCK:
+//			sigdelsetmask(&new_blocked, new_set);
+//			break;
+//		case SIG_SETMASK:
+//			compat_sig_setmask(&new_blocked, new_set);
+//			break;
+//		default:
+//			return -EINVAL;
+//		}
+//
+//		set_current_blocked(&new_blocked);
+//	}
+//
+//	if (oset) {
+//		if (put_user(old_set, oset))
+//			return -EFAULT;
+//	}
+//
+//	return 0;
+//}
 
 #endif
 
@@ -320,53 +320,53 @@ static int compat_get_user_cpu_mask(compat_ulong_t __user *user_mask_ptr,
 	return compat_get_bitmap(k, user_mask_ptr, len * 8);
 }
 
-COMPAT_SYSCALL_DEFINE3(sched_setaffinity, compat_pid_t, pid,
-		       unsigned int, len,
-		       compat_ulong_t __user *, user_mask_ptr)
-{
-	cpumask_var_t new_mask;
-	int retval;
+//COMPAT_SYSCALL_DEFINE3(sched_setaffinity, compat_pid_t, pid,
+//		       unsigned int, len,
+//		       compat_ulong_t __user *, user_mask_ptr)
+//{
+//	cpumask_var_t new_mask;
+//	int retval;
+//
+//	if (!alloc_cpumask_var(&new_mask, GFP_KERNEL))
+//		return -ENOMEM;
+//
+//	retval = compat_get_user_cpu_mask(user_mask_ptr, len, new_mask);
+//	if (retval)
+//		goto out;
+//
+//	retval = sched_setaffinity(pid, new_mask);
+//out:
+//	free_cpumask_var(new_mask);
+//	return retval;
+//}
 
-	if (!alloc_cpumask_var(&new_mask, GFP_KERNEL))
-		return -ENOMEM;
-
-	retval = compat_get_user_cpu_mask(user_mask_ptr, len, new_mask);
-	if (retval)
-		goto out;
-
-	retval = sched_setaffinity(pid, new_mask);
-out:
-	free_cpumask_var(new_mask);
-	return retval;
-}
-
-COMPAT_SYSCALL_DEFINE3(sched_getaffinity, compat_pid_t,  pid, unsigned int, len,
-		       compat_ulong_t __user *, user_mask_ptr)
-{
-	int ret;
-	cpumask_var_t mask;
-
-	if ((len * BITS_PER_BYTE) < nr_cpu_ids)
-		return -EINVAL;
-	if (len & (sizeof(compat_ulong_t)-1))
-		return -EINVAL;
-
-	if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-		return -ENOMEM;
-
-	ret = sched_getaffinity(pid, mask);
-	if (ret == 0) {
-		size_t retlen = min_t(size_t, len, cpumask_size());
-
-		if (compat_put_bitmap(user_mask_ptr, cpumask_bits(mask), retlen * 8))
-			ret = -EFAULT;
-		else
-			ret = retlen;
-	}
-	free_cpumask_var(mask);
-
-	return ret;
-}
+//COMPAT_SYSCALL_DEFINE3(sched_getaffinity, compat_pid_t,  pid, unsigned int, len,
+//		       compat_ulong_t __user *, user_mask_ptr)
+//{
+//	int ret;
+//	cpumask_var_t mask;
+//
+//	if ((len * BITS_PER_BYTE) < nr_cpu_ids)
+//		return -EINVAL;
+//	if (len & (sizeof(compat_ulong_t)-1))
+//		return -EINVAL;
+//
+//	if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
+//		return -ENOMEM;
+//
+//	ret = sched_getaffinity(pid, mask);
+//	if (ret == 0) {
+//		size_t retlen = min_t(size_t, len, cpumask_size());
+//
+//		if (compat_put_bitmap(user_mask_ptr, cpumask_bits(mask), retlen * 8))
+//			ret = -EFAULT;
+//		else
+//			ret = retlen;
+//	}
+//	free_cpumask_var(mask);
+//
+//	return ret;
+//}
 
 int get_compat_itimerspec(struct itimerspec *dst,
 			  const struct compat_itimerspec __user *src)
@@ -508,75 +508,75 @@ sigset_to_compat(compat_sigset_t *compat, const sigset_t *set)
 }
 
 #ifdef CONFIG_NUMA
-COMPAT_SYSCALL_DEFINE6(move_pages, pid_t, pid, compat_ulong_t, nr_pages,
-		       compat_uptr_t __user *, pages32,
-		       const int __user *, nodes,
-		       int __user *, status,
-		       int, flags)
-{
-	const void __user * __user *pages;
-	int i;
+//COMPAT_SYSCALL_DEFINE6(move_pages, pid_t, pid, compat_ulong_t, nr_pages,
+//		       compat_uptr_t __user *, pages32,
+//		       const int __user *, nodes,
+//		       int __user *, status,
+//		       int, flags)
+//{
+//	const void __user * __user *pages;
+//	int i;
+//
+//	pages = compat_alloc_user_space(nr_pages * sizeof(void *));
+//	for (i = 0; i < nr_pages; i++) {
+//		compat_uptr_t p;
+//
+//		if (get_user(p, pages32 + i) ||
+//			put_user(compat_ptr(p), pages + i))
+//			return -EFAULT;
+//	}
+//	return sys_move_pages(pid, nr_pages, pages, nodes, status, flags);
+//}
 
-	pages = compat_alloc_user_space(nr_pages * sizeof(void *));
-	for (i = 0; i < nr_pages; i++) {
-		compat_uptr_t p;
-
-		if (get_user(p, pages32 + i) ||
-			put_user(compat_ptr(p), pages + i))
-			return -EFAULT;
-	}
-	return sys_move_pages(pid, nr_pages, pages, nodes, status, flags);
-}
-
-COMPAT_SYSCALL_DEFINE4(migrate_pages, compat_pid_t, pid,
-		       compat_ulong_t, maxnode,
-		       const compat_ulong_t __user *, old_nodes,
-		       const compat_ulong_t __user *, new_nodes)
-{
-	unsigned long __user *old = NULL;
-	unsigned long __user *new = NULL;
-	nodemask_t tmp_mask;
-	unsigned long nr_bits;
-	unsigned long size;
-
-	nr_bits = min_t(unsigned long, maxnode - 1, MAX_NUMNODES);
-	size = ALIGN(nr_bits, BITS_PER_LONG) / 8;
-	if (old_nodes) {
-		if (compat_get_bitmap(nodes_addr(tmp_mask), old_nodes, nr_bits))
-			return -EFAULT;
-		old = compat_alloc_user_space(new_nodes ? size * 2 : size);
-		if (new_nodes)
-			new = old + size / sizeof(unsigned long);
-		if (copy_to_user(old, nodes_addr(tmp_mask), size))
-			return -EFAULT;
-	}
-	if (new_nodes) {
-		if (compat_get_bitmap(nodes_addr(tmp_mask), new_nodes, nr_bits))
-			return -EFAULT;
-		if (new == NULL)
-			new = compat_alloc_user_space(size);
-		if (copy_to_user(new, nodes_addr(tmp_mask), size))
-			return -EFAULT;
-	}
-	return sys_migrate_pages(pid, nr_bits + 1, old, new);
-}
+//COMPAT_SYSCALL_DEFINE4(migrate_pages, compat_pid_t, pid,
+//		       compat_ulong_t, maxnode,
+//		       const compat_ulong_t __user *, old_nodes,
+//		       const compat_ulong_t __user *, new_nodes)
+//{
+//	unsigned long __user *old = NULL;
+//	unsigned long __user *new = NULL;
+//	nodemask_t tmp_mask;
+//	unsigned long nr_bits;
+//	unsigned long size;
+//
+//	nr_bits = min_t(unsigned long, maxnode - 1, MAX_NUMNODES);
+//	size = ALIGN(nr_bits, BITS_PER_LONG) / 8;
+//	if (old_nodes) {
+//		if (compat_get_bitmap(nodes_addr(tmp_mask), old_nodes, nr_bits))
+//			return -EFAULT;
+//		old = compat_alloc_user_space(new_nodes ? size * 2 : size);
+//		if (new_nodes)
+//			new = old + size / sizeof(unsigned long);
+//		if (copy_to_user(old, nodes_addr(tmp_mask), size))
+//			return -EFAULT;
+//	}
+//	if (new_nodes) {
+//		if (compat_get_bitmap(nodes_addr(tmp_mask), new_nodes, nr_bits))
+//			return -EFAULT;
+//		if (new == NULL)
+//			new = compat_alloc_user_space(size);
+//		if (copy_to_user(new, nodes_addr(tmp_mask), size))
+//			return -EFAULT;
+//	}
+//	return sys_migrate_pages(pid, nr_bits + 1, old, new);
+//}
 #endif
 
-COMPAT_SYSCALL_DEFINE2(sched_rr_get_interval,
-		       compat_pid_t, pid,
-		       struct compat_timespec __user *, interval)
-{
-	struct timespec t;
-	int ret;
-	mm_segment_t old_fs = get_fs();
-
-	set_fs(KERNEL_DS);
-	ret = sys_sched_rr_get_interval(pid, (struct timespec __user *)&t);
-	set_fs(old_fs);
-	if (compat_put_timespec(&t, interval))
-		return -EFAULT;
-	return ret;
-}
+//COMPAT_SYSCALL_DEFINE2(sched_rr_get_interval,
+//		       compat_pid_t, pid,
+//		       struct compat_timespec __user *, interval)
+//{
+//	struct timespec t;
+//	int ret;
+//	mm_segment_t old_fs = get_fs();
+//
+//	set_fs(KERNEL_DS);
+//	ret = sys_sched_rr_get_interval(pid, (struct timespec __user *)&t);
+//	set_fs(old_fs);
+//	if (compat_put_timespec(&t, interval))
+//		return -EFAULT;
+//	return ret;
+//}
 
 /*
  * Allocate user-space memory for the duration of a single system call,
