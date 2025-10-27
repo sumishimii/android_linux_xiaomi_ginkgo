@@ -694,10 +694,10 @@ SYSCALL_DEFINE2(arch_prctl, int, option, unsigned long, arg2)
 }
 
 #ifdef CONFIG_IA32_EMULATION
-//COMPAT_SYSCALL_DEFINE2(arch_prctl, int, option, unsigned long, arg2)
-//{
-//	return do_arch_prctl_common(current, option, arg2);
-//}
+COMPAT_SYSCALL_DEFINE2(arch_prctl, int, option, unsigned long, arg2)
+{
+	return do_arch_prctl_common(current, option, arg2);
+}
 #endif
 
 unsigned long KSTK_ESP(struct task_struct *task)

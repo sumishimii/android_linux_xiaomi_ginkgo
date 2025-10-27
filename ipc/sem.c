@@ -1667,50 +1667,50 @@ static int copy_compat_semid_to_user(void __user *buf, struct semid64_ds *in,
 	}
 }
 
-//COMPAT_SYSCALL_DEFINE4(semctl, int, semid, int, semnum, int, cmd, int, arg)
-//{
-//	void __user *p = compat_ptr(arg);
-//	struct ipc_namespace *ns;
-//	struct semid64_ds semid64;
-//	int version = compat_ipc_parse_version(&cmd);
-//	int err;
-//
-//	ns = current->nsproxy->ipc_ns;
-//
-//	if (semid < 0)
-//		return -EINVAL;
-//
-//	switch (cmd & (~IPC_64)) {
-//	case IPC_INFO:
-//	case SEM_INFO:
-//		return semctl_info(ns, semid, cmd, p);
-//	case IPC_STAT:
-//	case SEM_STAT:
-//		err = semctl_stat(ns, semid, cmd, &semid64);
-//		if (err < 0)
-//			return err;
-//		if (copy_compat_semid_to_user(p, &semid64, version))
-//			err = -EFAULT;
-//		return err;
-//	case GETVAL:
-//	case GETPID:
-//	case GETNCNT:
-//	case GETZCNT:
-//	case GETALL:
-//	case SETALL:
-//		return semctl_main(ns, semid, semnum, cmd, p);
-//	case SETVAL:
-//		return semctl_setval(ns, semid, semnum, arg);
-//	case IPC_SET:
-//		if (copy_compat_semid_from_user(&semid64, p, version))
-//			return -EFAULT;
-//		/* fallthru */
-//	case IPC_RMID:
-//		return semctl_down(ns, semid, cmd, &semid64);
-//	default:
-//		return -EINVAL;
-//	}
-//}
+COMPAT_SYSCALL_DEFINE4(semctl, int, semid, int, semnum, int, cmd, int, arg)
+{
+	void __user *p = compat_ptr(arg);
+	struct ipc_namespace *ns;
+	struct semid64_ds semid64;
+	int version = compat_ipc_parse_version(&cmd);
+	int err;
+
+	ns = current->nsproxy->ipc_ns;
+
+	if (semid < 0)
+		return -EINVAL;
+
+	switch (cmd & (~IPC_64)) {
+	case IPC_INFO:
+	case SEM_INFO:
+		return semctl_info(ns, semid, cmd, p);
+	case IPC_STAT:
+	case SEM_STAT:
+		err = semctl_stat(ns, semid, cmd, &semid64);
+		if (err < 0)
+			return err;
+		if (copy_compat_semid_to_user(p, &semid64, version))
+			err = -EFAULT;
+		return err;
+	case GETVAL:
+	case GETPID:
+	case GETNCNT:
+	case GETZCNT:
+	case GETALL:
+	case SETALL:
+		return semctl_main(ns, semid, semnum, cmd, p);
+	case SETVAL:
+		return semctl_setval(ns, semid, semnum, arg);
+	case IPC_SET:
+		if (copy_compat_semid_from_user(&semid64, p, version))
+			return -EFAULT;
+		/* fallthru */
+	case IPC_RMID:
+		return semctl_down(ns, semid, cmd, &semid64);
+	default:
+		return -EINVAL;
+	}
+}
 #endif
 
 /* If the task doesn't already have a undo_list, then allocate one
@@ -2124,18 +2124,18 @@ SYSCALL_DEFINE4(semtimedop, int, semid, struct sembuf __user *, tsops,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(semtimedop, int, semid, struct sembuf __user *, tsems,
-//		       unsigned, nsops,
-//		       const struct compat_timespec __user *, timeout)
-//{
-//	if (timeout) {
-//		struct timespec64 ts;
-//		if (compat_get_timespec64(&ts, timeout))
-//			return -EFAULT;
-//		return do_semtimedop(semid, tsems, nsops, &ts);
-//	}
-//	return do_semtimedop(semid, tsems, nsops, NULL);
-//}
+COMPAT_SYSCALL_DEFINE4(semtimedop, int, semid, struct sembuf __user *, tsems,
+		       unsigned, nsops,
+		       const struct compat_timespec __user *, timeout)
+{
+	if (timeout) {
+		struct timespec64 ts;
+		if (compat_get_timespec64(&ts, timeout))
+			return -EFAULT;
+		return do_semtimedop(semid, tsems, nsops, &ts);
+	}
+	return do_semtimedop(semid, tsems, nsops, NULL);
+}
 #endif
 
 SYSCALL_DEFINE3(semop, int, semid, struct sembuf __user *, tsops,

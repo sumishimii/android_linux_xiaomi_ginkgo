@@ -1468,18 +1468,18 @@ static inline int put_compat_mq_attr(const struct mq_attr *attr,
 	return 0;
 }
 
-//COMPAT_SYSCALL_DEFINE4(mq_open, const char __user *, u_name,
-//		       int, oflag, compat_mode_t, mode,
-//		       struct compat_mq_attr __user *, u_attr)
-//{
-//	struct mq_attr attr, *p = NULL;
-//	if (u_attr && oflag & O_CREAT) {
-//		p = &attr;
-//		if (get_compat_mq_attr(&attr, u_attr))
-//			return -EFAULT;
-//	}
-//	return do_mq_open(u_name, oflag, mode, p);
-//}
+COMPAT_SYSCALL_DEFINE4(mq_open, const char __user *, u_name,
+		       int, oflag, compat_mode_t, mode,
+		       struct compat_mq_attr __user *, u_attr)
+{
+	struct mq_attr attr, *p = NULL;
+	if (u_attr && oflag & O_CREAT) {
+		p = &attr;
+		if (get_compat_mq_attr(&attr, u_attr))
+			return -EFAULT;
+	}
+	return do_mq_open(u_name, oflag, mode, p);
+}
 
 static int compat_prepare_timeout(const struct compat_timespec __user *p,
 				   struct timespec64 *ts)
@@ -1491,20 +1491,20 @@ static int compat_prepare_timeout(const struct compat_timespec __user *p,
 	return 0;
 }
 
-//COMPAT_SYSCALL_DEFINE5(mq_timedsend, mqd_t, mqdes,
-//		       const char __user *, u_msg_ptr,
-//		       compat_size_t, msg_len, unsigned int, msg_prio,
-//		       const struct compat_timespec __user *, u_abs_timeout)
-//{
-//	struct timespec64 ts, *p = NULL;
-//	if (u_abs_timeout) {
-//		int res = compat_prepare_timeout(u_abs_timeout, &ts);
-//		if (res)
-//			return res;
-//		p = &ts;
-//	}
-//	return do_mq_timedsend(mqdes, u_msg_ptr, msg_len, msg_prio, p);
-//}
+COMPAT_SYSCALL_DEFINE5(mq_timedsend, mqd_t, mqdes,
+		       const char __user *, u_msg_ptr,
+		       compat_size_t, msg_len, unsigned int, msg_prio,
+		       const struct compat_timespec __user *, u_abs_timeout)
+{
+	struct timespec64 ts, *p = NULL;
+	if (u_abs_timeout) {
+		int res = compat_prepare_timeout(u_abs_timeout, &ts);
+		if (res)
+			return res;
+		p = &ts;
+	}
+	return do_mq_timedsend(mqdes, u_msg_ptr, msg_len, msg_prio, p);
+}
 
 //COMPAT_SYSCALL_DEFINE5(mq_timedreceive, mqd_t, mqdes,
 //		       char __user *, u_msg_ptr,
@@ -1521,44 +1521,44 @@ static int compat_prepare_timeout(const struct compat_timespec __user *p,
 //	return do_mq_timedreceive(mqdes, u_msg_ptr, msg_len, u_msg_prio, p);
 //}
 
-//COMPAT_SYSCALL_DEFINE2(mq_notify, mqd_t, mqdes,
-//		       const struct compat_sigevent __user *, u_notification)
-//{
-//	struct sigevent n, *p = NULL;
-//	if (u_notification) {
-//		if (get_compat_sigevent(&n, u_notification))
-//			return -EFAULT;
-//		if (n.sigev_notify == SIGEV_THREAD)
-//			n.sigev_value.sival_ptr = compat_ptr(n.sigev_value.sival_int);
-//		p = &n;
-//	}
-//	return do_mq_notify(mqdes, p);
-//}
+COMPAT_SYSCALL_DEFINE2(mq_notify, mqd_t, mqdes,
+		       const struct compat_sigevent __user *, u_notification)
+{
+	struct sigevent n, *p = NULL;
+	if (u_notification) {
+		if (get_compat_sigevent(&n, u_notification))
+			return -EFAULT;
+		if (n.sigev_notify == SIGEV_THREAD)
+			n.sigev_value.sival_ptr = compat_ptr(n.sigev_value.sival_int);
+		p = &n;
+	}
+	return do_mq_notify(mqdes, p);
+}
 
-//COMPAT_SYSCALL_DEFINE3(mq_getsetattr, mqd_t, mqdes,
-//		       const struct compat_mq_attr __user *, u_mqstat,
-//		       struct compat_mq_attr __user *, u_omqstat)
-//{
-//	int ret;
-//	struct mq_attr mqstat, omqstat;
-//	struct mq_attr *new = NULL, *old = NULL;
-//
-//	if (u_mqstat) {
-//		new = &mqstat;
-//		if (get_compat_mq_attr(new, u_mqstat))
-//			return -EFAULT;
-//	}
-//	if (u_omqstat)
-//		old = &omqstat;
-//
-//	ret = do_mq_getsetattr(mqdes, new, old);
-//	if (ret || !old)
-//		return ret;
-//
-//	if (put_compat_mq_attr(old, u_omqstat))
-//		return -EFAULT;
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE3(mq_getsetattr, mqd_t, mqdes,
+		       const struct compat_mq_attr __user *, u_mqstat,
+		       struct compat_mq_attr __user *, u_omqstat)
+{
+	int ret;
+	struct mq_attr mqstat, omqstat;
+	struct mq_attr *new = NULL, *old = NULL;
+
+	if (u_mqstat) {
+		new = &mqstat;
+		if (get_compat_mq_attr(new, u_mqstat))
+			return -EFAULT;
+	}
+	if (u_omqstat)
+		old = &omqstat;
+
+	ret = do_mq_getsetattr(mqdes, new, old);
+	if (ret || !old)
+		return ret;
+
+	if (put_compat_mq_attr(old, u_omqstat))
+		return -EFAULT;
+	return 0;
+}
 #endif
 
 static const struct inode_operations mqueue_dir_inode_operations = {

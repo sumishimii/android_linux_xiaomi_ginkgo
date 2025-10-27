@@ -39,46 +39,46 @@
 #define SYSCALL_PAIR(name) u32, name ## _lo, u32, name ## _hi
 #endif
 
-//COMPAT_SYSCALL_DEFINE4(truncate64, char __user *, filename, u32, dummy,
-//		       SYSCALL_PAIR(length))
-//{
-//	return sys_truncate(filename, ((loff_t)length_hi << 32) | length_lo);
-//}
+COMPAT_SYSCALL_DEFINE4(truncate64, char __user *, filename, u32, dummy,
+		       SYSCALL_PAIR(length))
+{
+	return sys_truncate(filename, ((loff_t)length_hi << 32) | length_lo);
+}
 
-//COMPAT_SYSCALL_DEFINE4(ftruncate64, unsigned int, fd, u32, dummy,
-//		       SYSCALL_PAIR(length))
-//{
-//	return sys_ftruncate(fd, ((loff_t)length_hi << 32) | length_lo);
-//}
+COMPAT_SYSCALL_DEFINE4(ftruncate64, unsigned int, fd, u32, dummy,
+		       SYSCALL_PAIR(length))
+{
+	return sys_ftruncate(fd, ((loff_t)length_hi << 32) | length_lo);
+}
 
-//COMPAT_SYSCALL_DEFINE6(pread64, unsigned int, fd, char __user *, ubuf,
-//		       size_t, count, u32, dummy, SYSCALL_PAIR(offset))
-//{
-//	return sys_pread64(fd, ubuf, count,
-//			   ((loff_t)offset_hi << 32) | offset_lo);
-//}
+COMPAT_SYSCALL_DEFINE6(pread64, unsigned int, fd, char __user *, ubuf,
+		       size_t, count, u32, dummy, SYSCALL_PAIR(offset))
+{
+	return sys_pread64(fd, ubuf, count,
+			   ((loff_t)offset_hi << 32) | offset_lo);
+}
 
-//COMPAT_SYSCALL_DEFINE6(pwrite64, unsigned int, fd, char __user *, ubuf,
-//		       size_t, count, u32, dummy, SYSCALL_PAIR(offset))
-//{
-//	return sys_pwrite64(fd, ubuf, count,
-//			    ((loff_t)offset_hi << 32) | offset_lo);
-//}
+COMPAT_SYSCALL_DEFINE6(pwrite64, unsigned int, fd, char __user *, ubuf,
+		       size_t, count, u32, dummy, SYSCALL_PAIR(offset))
+{
+	return sys_pwrite64(fd, ubuf, count,
+			    ((loff_t)offset_hi << 32) | offset_lo);
+}
 
-//COMPAT_SYSCALL_DEFINE6(sync_file_range2, int, fd, unsigned int, flags,
-//		       SYSCALL_PAIR(offset), SYSCALL_PAIR(nbytes))
-//{
-//	return sys_sync_file_range(fd, ((loff_t)offset_hi << 32) | offset_lo,
-//				   ((loff_t)nbytes_hi << 32) | nbytes_lo,
-//				   flags);
-//}
+COMPAT_SYSCALL_DEFINE6(sync_file_range2, int, fd, unsigned int, flags,
+		       SYSCALL_PAIR(offset), SYSCALL_PAIR(nbytes))
+{
+	return sys_sync_file_range(fd, ((loff_t)offset_hi << 32) | offset_lo,
+				   ((loff_t)nbytes_hi << 32) | nbytes_lo,
+				   flags);
+}
 
-//COMPAT_SYSCALL_DEFINE6(fallocate, int, fd, int, mode,
-//		       SYSCALL_PAIR(offset), SYSCALL_PAIR(len))
-//{
-//	return sys_fallocate(fd, mode, ((loff_t)offset_hi << 32) | offset_lo,
-//			     ((loff_t)len_hi << 32) | len_lo);
-//}
+COMPAT_SYSCALL_DEFINE6(fallocate, int, fd, int, mode,
+		       SYSCALL_PAIR(offset), SYSCALL_PAIR(len))
+{
+	return sys_fallocate(fd, mode, ((loff_t)offset_hi << 32) | offset_lo,
+			     ((loff_t)len_hi << 32) | len_lo);
+}
 
 /*
  * Avoid bug in generic sys_llseek() that specifies offset_high and
@@ -87,12 +87,12 @@
  * Note that we do not use SYSCALL_PAIR here since glibc passes the
  * high and low parts explicitly in that order.
  */
-//COMPAT_SYSCALL_DEFINE5(llseek, unsigned int, fd, unsigned int, offset_high,
-//		       unsigned int, offset_low, loff_t __user *, result,
-//		       unsigned int, origin)
-//{
-//	return sys_llseek(fd, offset_high, offset_low, result, origin);
-//}
+COMPAT_SYSCALL_DEFINE5(llseek, unsigned int, fd, unsigned int, offset_high,
+		       unsigned int, offset_low, loff_t __user *, result,
+		       unsigned int, origin)
+{
+	return sys_llseek(fd, offset_high, offset_low, result, origin);
+}
 
 /* Provide the compat syscall number to call mapping. */
 #undef __SYSCALL

@@ -1309,61 +1309,61 @@ static int copy_compat_shmid_from_user(struct shmid64_ds *out, void __user *buf,
 	}
 }
 
-//COMPAT_SYSCALL_DEFINE3(shmctl, int, shmid, int, cmd, void __user *, uptr)
-//{
-//	struct ipc_namespace *ns;
-//	struct shmid64_ds sem64;
-//	int version = compat_ipc_parse_version(&cmd);
-//	int err;
-//
-//	ns = current->nsproxy->ipc_ns;
-//
-//	if (cmd < 0 || shmid < 0)
-//		return -EINVAL;
-//
-//	switch (cmd) {
-//	case IPC_INFO: {
-//		struct shminfo64 shminfo;
-//		err = shmctl_ipc_info(ns, &shminfo);
-//		if (err < 0)
-//			return err;
-//		if (copy_compat_shminfo_to_user(uptr, &shminfo, version))
-//			err = -EFAULT;
-//		return err;
-//	}
-//	case SHM_INFO: {
-//		struct shm_info shm_info;
-//		err = shmctl_shm_info(ns, &shm_info);
-//		if (err < 0)
-//			return err;
-//		if (put_compat_shm_info(&shm_info, uptr))
-//			err = -EFAULT;
-//		return err;
-//	}
-//	case IPC_STAT:
-//	case SHM_STAT:
-//		err = shmctl_stat(ns, shmid, cmd, &sem64);
-//		if (err < 0)
-//			return err;
-//		if (copy_compat_shmid_to_user(uptr, &sem64, version))
-//			err = -EFAULT;
-//		return err;
-//
-//	case IPC_SET:
-//		if (copy_compat_shmid_from_user(&sem64, uptr, version))
-//			return -EFAULT;
-//		/* fallthru */
-//	case IPC_RMID:
-//		return shmctl_down(ns, shmid, cmd, &sem64);
-//	case SHM_LOCK:
-//	case SHM_UNLOCK:
-//		return shmctl_do_lock(ns, shmid, cmd);
-//		break;
-//	default:
-//		return -EINVAL;
-//	}
-//	return err;
-//}
+COMPAT_SYSCALL_DEFINE3(shmctl, int, shmid, int, cmd, void __user *, uptr)
+{
+	struct ipc_namespace *ns;
+	struct shmid64_ds sem64;
+	int version = compat_ipc_parse_version(&cmd);
+	int err;
+
+	ns = current->nsproxy->ipc_ns;
+
+	if (cmd < 0 || shmid < 0)
+		return -EINVAL;
+
+	switch (cmd) {
+	case IPC_INFO: {
+		struct shminfo64 shminfo;
+		err = shmctl_ipc_info(ns, &shminfo);
+		if (err < 0)
+			return err;
+		if (copy_compat_shminfo_to_user(uptr, &shminfo, version))
+			err = -EFAULT;
+		return err;
+	}
+	case SHM_INFO: {
+		struct shm_info shm_info;
+		err = shmctl_shm_info(ns, &shm_info);
+		if (err < 0)
+			return err;
+		if (put_compat_shm_info(&shm_info, uptr))
+			err = -EFAULT;
+		return err;
+	}
+	case IPC_STAT:
+	case SHM_STAT:
+		err = shmctl_stat(ns, shmid, cmd, &sem64);
+		if (err < 0)
+			return err;
+		if (copy_compat_shmid_to_user(uptr, &sem64, version))
+			err = -EFAULT;
+		return err;
+
+	case IPC_SET:
+		if (copy_compat_shmid_from_user(&sem64, uptr, version))
+			return -EFAULT;
+		/* fallthru */
+	case IPC_RMID:
+		return shmctl_down(ns, shmid, cmd, &sem64);
+	case SHM_LOCK:
+	case SHM_UNLOCK:
+		return shmctl_do_lock(ns, shmid, cmd);
+		break;
+	default:
+		return -EINVAL;
+	}
+	return err;
+}
 #endif
 
 /*
@@ -1568,17 +1568,17 @@ SYSCALL_DEFINE3(shmat, int, shmid, char __user *, shmaddr, int, shmflg)
 #define COMPAT_SHMLBA	SHMLBA
 #endif
 
-//COMPAT_SYSCALL_DEFINE3(shmat, int, shmid, compat_uptr_t, shmaddr, int, shmflg)
-//{
-//	unsigned long ret;
-//	long err;
-//
-//	err = do_shmat(shmid, compat_ptr(shmaddr), shmflg, &ret, COMPAT_SHMLBA);
-//	if (err)
-//		return err;
-//	force_successful_syscall_return();
-//	return (long)ret;
-//}
+COMPAT_SYSCALL_DEFINE3(shmat, int, shmid, compat_uptr_t, shmaddr, int, shmflg)
+{
+	unsigned long ret;
+	long err;
+
+	err = do_shmat(shmid, compat_ptr(shmaddr), shmflg, &ret, COMPAT_SHMLBA);
+	if (err)
+		return err;
+	force_successful_syscall_return();
+	return (long)ret;
+}
 #endif
 
 /*

@@ -560,30 +560,30 @@ SYSCALL_DEFINE2(timerfd_gettime, int, ufd, struct itimerspec __user *, otmr)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(timerfd_settime, int, ufd, int, flags,
-//		const struct compat_itimerspec __user *, utmr,
-//		struct compat_itimerspec __user *, otmr)
-//{
-//	struct itimerspec64 new, old;
-//	int ret;
-//
-//	if (get_compat_itimerspec64(&new, utmr))
-//		return -EFAULT;
-//	ret = do_timerfd_settime(ufd, flags, &new, &old);
-//	if (ret)
-//		return ret;
-//	if (otmr && put_compat_itimerspec64(&old, otmr))
-//		return -EFAULT;
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE4(timerfd_settime, int, ufd, int, flags,
+		const struct compat_itimerspec __user *, utmr,
+		struct compat_itimerspec __user *, otmr)
+{
+	struct itimerspec64 new, old;
+	int ret;
 
-//COMPAT_SYSCALL_DEFINE2(timerfd_gettime, int, ufd,
-//		struct compat_itimerspec __user *, otmr)
-//{
-//	struct itimerspec64 kotmr;
-//	int ret = do_timerfd_gettime(ufd, &kotmr);
-//	if (ret)
-//		return ret;
-//	return put_compat_itimerspec64(&kotmr, otmr) ? -EFAULT : 0;
-//}
+	if (get_compat_itimerspec64(&new, utmr))
+		return -EFAULT;
+	ret = do_timerfd_settime(ufd, flags, &new, &old);
+	if (ret)
+		return ret;
+	if (otmr && put_compat_itimerspec64(&old, otmr))
+		return -EFAULT;
+	return ret;
+}
+
+COMPAT_SYSCALL_DEFINE2(timerfd_gettime, int, ufd,
+		struct compat_itimerspec __user *, otmr)
+{
+	struct itimerspec64 kotmr;
+	int ret = do_timerfd_gettime(ufd, &kotmr);
+	if (ret)
+		return ret;
+	return put_compat_itimerspec64(&kotmr, otmr) ? -EFAULT : 0;
+}
 #endif

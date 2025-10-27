@@ -612,55 +612,55 @@ static int cp_compat_stat(struct kstat *stat, struct compat_stat __user *ubuf)
 	return copy_to_user(ubuf, &tmp, sizeof(tmp)) ? -EFAULT : 0;
 }
 
-//COMPAT_SYSCALL_DEFINE2(newstat, const char __user *, filename,
-//		       struct compat_stat __user *, statbuf)
-//{
-//	struct kstat stat;
-//	int error;
-//
-//	error = vfs_stat(filename, &stat);
-//	if (error)
-//		return error;
-//	return cp_compat_stat(&stat, statbuf);
-//}
+COMPAT_SYSCALL_DEFINE2(newstat, const char __user *, filename,
+		       struct compat_stat __user *, statbuf)
+{
+	struct kstat stat;
+	int error;
 
-//COMPAT_SYSCALL_DEFINE2(newlstat, const char __user *, filename,
-//		       struct compat_stat __user *, statbuf)
-//{
-//	struct kstat stat;
-//	int error;
-//
-//	error = vfs_lstat(filename, &stat);
-//	if (error)
-//		return error;
-//	return cp_compat_stat(&stat, statbuf);
-//}
+	error = vfs_stat(filename, &stat);
+	if (error)
+		return error;
+	return cp_compat_stat(&stat, statbuf);
+}
+
+COMPAT_SYSCALL_DEFINE2(newlstat, const char __user *, filename,
+		       struct compat_stat __user *, statbuf)
+{
+	struct kstat stat;
+	int error;
+
+	error = vfs_lstat(filename, &stat);
+	if (error)
+		return error;
+	return cp_compat_stat(&stat, statbuf);
+}
 
 #ifndef __ARCH_WANT_STAT64
-//COMPAT_SYSCALL_DEFINE4(newfstatat, unsigned int, dfd,
-//		       const char __user *, filename,
-//		       struct compat_stat __user *, statbuf, int, flag)
-//{
-//	struct kstat stat;
-//	int error;
-//
-//	error = vfs_fstatat(dfd, filename, &stat, flag);
-//	if (error)
-//		return error;
-//	return cp_compat_stat(&stat, statbuf);
-//}
+COMPAT_SYSCALL_DEFINE4(newfstatat, unsigned int, dfd,
+		       const char __user *, filename,
+		       struct compat_stat __user *, statbuf, int, flag)
+{
+	struct kstat stat;
+	int error;
+
+	error = vfs_fstatat(dfd, filename, &stat, flag);
+	if (error)
+		return error;
+	return cp_compat_stat(&stat, statbuf);
+}
 #endif
 
-//COMPAT_SYSCALL_DEFINE2(newfstat, unsigned int, fd,
-//		       struct compat_stat __user *, statbuf)
-//{
-//	struct kstat stat;
-//	int error = vfs_fstat(fd, &stat);
-//
-//	if (!error)
-//		error = cp_compat_stat(&stat, statbuf);
-//	return error;
-//}
+COMPAT_SYSCALL_DEFINE2(newfstat, unsigned int, fd,
+		       struct compat_stat __user *, statbuf)
+{
+	struct kstat stat;
+	int error = vfs_fstat(fd, &stat);
+
+	if (!error)
+		error = cp_compat_stat(&stat, statbuf);
+	return error;
+}
 #endif
 
 /* Caller is here responsible for sufficient locking (ie. inode->i_lock) */

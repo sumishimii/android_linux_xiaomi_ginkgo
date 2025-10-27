@@ -290,53 +290,53 @@ static int restore_sigregs_ext32(struct pt_regs *regs,
 	return 0;
 }
 
-//COMPAT_SYSCALL_DEFINE0(sigreturn)
-//{
-//	struct pt_regs *regs = task_pt_regs(current);
-//	sigframe32 __user *frame = (sigframe32 __user *)regs->gprs[15];
-//	compat_sigset_t cset;
-//	sigset_t set;
-//
-//	if (__copy_from_user(&cset.sig, &frame->sc.oldmask, _SIGMASK_COPY_SIZE32))
-//		goto badframe;
-//	sigset32_to_sigset(cset.sig, set.sig);
-//	set_current_blocked(&set);
-//	save_fpu_regs();
-//	if (restore_sigregs32(regs, &frame->sregs))
-//		goto badframe;
-//	if (restore_sigregs_ext32(regs, &frame->sregs_ext))
-//		goto badframe;
-//	load_sigregs();
-//	return regs->gprs[2];
-//badframe:
-//	force_sig(SIGSEGV, current);
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE0(sigreturn)
+{
+	struct pt_regs *regs = task_pt_regs(current);
+	sigframe32 __user *frame = (sigframe32 __user *)regs->gprs[15];
+	compat_sigset_t cset;
+	sigset_t set;
 
-//COMPAT_SYSCALL_DEFINE0(rt_sigreturn)
-//{
-//	struct pt_regs *regs = task_pt_regs(current);
-//	rt_sigframe32 __user *frame = (rt_sigframe32 __user *)regs->gprs[15];
-//	compat_sigset_t cset;
-//	sigset_t set;
-//
-//	if (__copy_from_user(&cset, &frame->uc.uc_sigmask, sizeof(cset)))
-//		goto badframe;
-//	sigset32_to_sigset(cset.sig, set.sig);
-//	set_current_blocked(&set);
-//	if (compat_restore_altstack(&frame->uc.uc_stack))
-//		goto badframe;
-//	save_fpu_regs();
-//	if (restore_sigregs32(regs, &frame->uc.uc_mcontext))
-//		goto badframe;
-//	if (restore_sigregs_ext32(regs, &frame->uc.uc_mcontext_ext))
-//		goto badframe;
-//	load_sigregs();
-//	return regs->gprs[2];
-//badframe:
-//	force_sig(SIGSEGV, current);
-//	return 0;
-//}	
+	if (__copy_from_user(&cset.sig, &frame->sc.oldmask, _SIGMASK_COPY_SIZE32))
+		goto badframe;
+	sigset32_to_sigset(cset.sig, set.sig);
+	set_current_blocked(&set);
+	save_fpu_regs();
+	if (restore_sigregs32(regs, &frame->sregs))
+		goto badframe;
+	if (restore_sigregs_ext32(regs, &frame->sregs_ext))
+		goto badframe;
+	load_sigregs();
+	return regs->gprs[2];
+badframe:
+	force_sig(SIGSEGV, current);
+	return 0;
+}
+
+COMPAT_SYSCALL_DEFINE0(rt_sigreturn)
+{
+	struct pt_regs *regs = task_pt_regs(current);
+	rt_sigframe32 __user *frame = (rt_sigframe32 __user *)regs->gprs[15];
+	compat_sigset_t cset;
+	sigset_t set;
+
+	if (__copy_from_user(&cset, &frame->uc.uc_sigmask, sizeof(cset)))
+		goto badframe;
+	sigset32_to_sigset(cset.sig, set.sig);
+	set_current_blocked(&set);
+	if (compat_restore_altstack(&frame->uc.uc_stack))
+		goto badframe;
+	save_fpu_regs();
+	if (restore_sigregs32(regs, &frame->uc.uc_mcontext))
+		goto badframe;
+	if (restore_sigregs_ext32(regs, &frame->uc.uc_mcontext_ext))
+		goto badframe;
+	load_sigregs();
+	return regs->gprs[2];
+badframe:
+	force_sig(SIGSEGV, current);
+	return 0;
+}	
 
 /*
  * Set up a signal frame.

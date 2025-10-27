@@ -283,23 +283,23 @@ static int put_compat_statfs(struct compat_statfs __user *ubuf, struct kstatfs *
  * The following statfs calls are copies of code from fs/statfs.c and
  * should be checked against those from time to time
  */
-//COMPAT_SYSCALL_DEFINE2(statfs, const char __user *, pathname, struct compat_statfs __user *, buf)
-//{
-//	struct kstatfs tmp;
-//	int error = user_statfs(pathname, &tmp);
-//	if (!error)
-//		error = put_compat_statfs(buf, &tmp);
-//	return error;
-//}
+COMPAT_SYSCALL_DEFINE2(statfs, const char __user *, pathname, struct compat_statfs __user *, buf)
+{
+	struct kstatfs tmp;
+	int error = user_statfs(pathname, &tmp);
+	if (!error)
+		error = put_compat_statfs(buf, &tmp);
+	return error;
+}
 
-//COMPAT_SYSCALL_DEFINE2(fstatfs, unsigned int, fd, struct compat_statfs __user *, buf)
-//{
-//	struct kstatfs tmp;
-//	int error = fd_statfs(fd, &tmp);
-//	if (!error)
-//		error = put_compat_statfs(buf, &tmp);
-//	return error;
-//}
+COMPAT_SYSCALL_DEFINE2(fstatfs, unsigned int, fd, struct compat_statfs __user *, buf)
+{
+	struct kstatfs tmp;
+	int error = fd_statfs(fd, &tmp);
+	if (!error)
+		error = put_compat_statfs(buf, &tmp);
+	return error;
+}
 
 static int put_compat_statfs64(struct compat_statfs64 __user *ubuf, struct kstatfs *kbuf)
 {
@@ -326,52 +326,52 @@ static int put_compat_statfs64(struct compat_statfs64 __user *ubuf, struct kstat
 	return 0;
 }
 
-//COMPAT_SYSCALL_DEFINE3(statfs64, const char __user *, pathname, compat_size_t, sz, struct compat_statfs64 __user *, buf)
-//{
-//	struct kstatfs tmp;
-//	int error;
-//
-//	if (sz != sizeof(*buf))
-//		return -EINVAL;
-//
-//	error = user_statfs(pathname, &tmp);
-//	if (!error)
-//		error = put_compat_statfs64(buf, &tmp);
-//	return error;
-//}
+COMPAT_SYSCALL_DEFINE3(statfs64, const char __user *, pathname, compat_size_t, sz, struct compat_statfs64 __user *, buf)
+{
+	struct kstatfs tmp;
+	int error;
 
-//COMPAT_SYSCALL_DEFINE3(fstatfs64, unsigned int, fd, compat_size_t, sz, struct compat_statfs64 __user *, buf)
-//{
-//	struct kstatfs tmp;
-//	int error;
-//
-//	if (sz != sizeof(*buf))
-//		return -EINVAL;
-//
-//	error = fd_statfs(fd, &tmp);
-//	if (!error)
-//		error = put_compat_statfs64(buf, &tmp);
-//	return error;
-//}
+	if (sz != sizeof(*buf))
+		return -EINVAL;
+
+	error = user_statfs(pathname, &tmp);
+	if (!error)
+		error = put_compat_statfs64(buf, &tmp);
+	return error;
+}
+
+COMPAT_SYSCALL_DEFINE3(fstatfs64, unsigned int, fd, compat_size_t, sz, struct compat_statfs64 __user *, buf)
+{
+	struct kstatfs tmp;
+	int error;
+
+	if (sz != sizeof(*buf))
+		return -EINVAL;
+
+	error = fd_statfs(fd, &tmp);
+	if (!error)
+		error = put_compat_statfs64(buf, &tmp);
+	return error;
+}
 
 /*
  * This is a copy of sys_ustat, just dealing with a structure layout.
  * Given how simple this syscall is that apporach is more maintainable
  * than the various conversion hacks.
  */
-//COMPAT_SYSCALL_DEFINE2(ustat, unsigned, dev, struct compat_ustat __user *, u)
-//{
-//	struct compat_ustat tmp;
-//	struct kstatfs sbuf;
-//	int err = vfs_ustat(new_decode_dev(dev), &sbuf);
-//	if (err)
-//		return err;
-//
-//	memset(&tmp, 0, sizeof(struct compat_ustat));
-//	tmp.f_tfree = sbuf.f_bfree;
-//	tmp.f_tinode = sbuf.f_ffree;
-//	if (copy_to_user(u, &tmp, sizeof(struct compat_ustat)))
-//		return -EFAULT;
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE2(ustat, unsigned, dev, struct compat_ustat __user *, u)
+{
+	struct compat_ustat tmp;
+	struct kstatfs sbuf;
+	int err = vfs_ustat(new_decode_dev(dev), &sbuf);
+	if (err)
+		return err;
+
+	memset(&tmp, 0, sizeof(struct compat_ustat));
+	tmp.f_tfree = sbuf.f_bfree;
+	tmp.f_tinode = sbuf.f_ffree;
+	if (copy_to_user(u, &tmp, sizeof(struct compat_ustat)))
+		return -EFAULT;
+	return 0;
+}
 #endif

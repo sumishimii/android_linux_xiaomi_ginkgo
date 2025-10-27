@@ -320,10 +320,10 @@ SYSCALL_DEFINE3(lseek, unsigned int, fd, off_t, offset, unsigned int, whence)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE3(lseek, unsigned int, fd, compat_off_t, offset, unsigned int, whence)
-//{
-//	return sys_lseek(fd, offset, whence);
-//}
+COMPAT_SYSCALL_DEFINE3(lseek, unsigned int, fd, compat_off_t, offset, unsigned int, whence)
+{
+	return sys_lseek(fd, offset, whence);
+}
 #endif
 
 #ifdef __ARCH_WANT_SYS_LLSEEK
@@ -1218,12 +1218,12 @@ static long do_compat_preadv64(unsigned long fd,
 }
 
 #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64
-//COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
-//		const struct compat_iovec __user *,vec,
-//		unsigned long, vlen, loff_t, pos)
-//{
-//	return do_compat_preadv64(fd, vec, vlen, pos, 0);
-//}
+COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
+		const struct compat_iovec __user *,vec,
+		unsigned long, vlen, loff_t, pos)
+{
+	return do_compat_preadv64(fd, vec, vlen, pos, 0);
+}
 #endif
 /*
 //////COMPAT_SYSCALL_DEFINE5(preadv, compat_ulong_t, fd,
@@ -1327,12 +1327,12 @@ static long do_compat_pwritev64(unsigned long fd,
 }
 
 #ifdef __ARCH_WANT_COMPAT_SYS_PWRITEV64
-//COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
-//		const struct compat_iovec __user *,vec,
-//		unsigned long, vlen, loff_t, pos)
-//{
-//	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
-//}
+COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
+		const struct compat_iovec __user *,vec,
+		unsigned long, vlen, loff_t, pos)
+{
+	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
+}
 #endif
 /*
 //////COMPAT_SYSCALL_DEFINE5(pwritev, compat_ulong_t, fd,
@@ -1507,43 +1507,43 @@ SYSCALL_DEFINE4(sendfile64, int, out_fd, int, in_fd, loff_t __user *, offset, si
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(sendfile, int, out_fd, int, in_fd,
-//		compat_off_t __user *, offset, compat_size_t, count)
-//{
-//	loff_t pos;
-//	off_t off;
-//	ssize_t ret;
-//
-//	if (offset) {
-//		if (unlikely(get_user(off, offset)))
-//			return -EFAULT;
-//		pos = off;
-//		ret = do_sendfile(out_fd, in_fd, &pos, count, MAX_NON_LFS);
-//		if (unlikely(put_user(pos, offset)))
-//			return -EFAULT;
-//		return ret;
-//	}
-//
-//	return do_sendfile(out_fd, in_fd, NULL, count, 0);
-//}
+COMPAT_SYSCALL_DEFINE4(sendfile, int, out_fd, int, in_fd,
+		compat_off_t __user *, offset, compat_size_t, count)
+{
+	loff_t pos;
+	off_t off;
+	ssize_t ret;
 
-//COMPAT_SYSCALL_DEFINE4(sendfile64, int, out_fd, int, in_fd,
-//		compat_loff_t __user *, offset, compat_size_t, count)
-//{
-//	loff_t pos;
-//	ssize_t ret;
-//
-//	if (offset) {
-//		if (unlikely(copy_from_user(&pos, offset, sizeof(loff_t))))
-//			return -EFAULT;
-//		ret = do_sendfile(out_fd, in_fd, &pos, count, 0);
-//		if (unlikely(put_user(pos, offset)))
-//			return -EFAULT;
-//		return ret;
-//	}
-//
-//	return do_sendfile(out_fd, in_fd, NULL, count, 0);
-//}
+	if (offset) {
+		if (unlikely(get_user(off, offset)))
+			return -EFAULT;
+		pos = off;
+		ret = do_sendfile(out_fd, in_fd, &pos, count, MAX_NON_LFS);
+		if (unlikely(put_user(pos, offset)))
+			return -EFAULT;
+		return ret;
+	}
+
+	return do_sendfile(out_fd, in_fd, NULL, count, 0);
+}
+
+COMPAT_SYSCALL_DEFINE4(sendfile64, int, out_fd, int, in_fd,
+		compat_loff_t __user *, offset, compat_size_t, count)
+{
+	loff_t pos;
+	ssize_t ret;
+
+	if (offset) {
+		if (unlikely(copy_from_user(&pos, offset, sizeof(loff_t))))
+			return -EFAULT;
+		ret = do_sendfile(out_fd, in_fd, &pos, count, 0);
+		if (unlikely(put_user(pos, offset)))
+			return -EFAULT;
+		return ret;
+	}
+
+	return do_sendfile(out_fd, in_fd, NULL, count, 0);
+}
 #endif
 
 /*

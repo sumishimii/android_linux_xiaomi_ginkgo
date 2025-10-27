@@ -105,39 +105,39 @@ SYSCALL_DEFINE1(stime, time_t __user *, tptr)
 #ifdef __ARCH_WANT_COMPAT_SYS_TIME
 
 /* compat_time_t is a 32 bit "long" and needs to get converted. */
-//COMPAT_SYSCALL_DEFINE1(time, compat_time_t __user *, tloc)
-//{
-//	struct timeval tv;
-//	compat_time_t i;
-//
-//	do_gettimeofday(&tv);
-//	i = tv.tv_sec;
-//
-//	if (tloc) {
-//		if (put_user(i,tloc))
-//			return -EFAULT;
-//	}
-//	force_successful_syscall_return();
-//	return i;
-//}
+COMPAT_SYSCALL_DEFINE1(time, compat_time_t __user *, tloc)
+{
+	struct timeval tv;
+	compat_time_t i;
 
-//COMPAT_SYSCALL_DEFINE1(stime, compat_time_t __user *, tptr)
-//{
-//	struct timespec tv;
-//	int err;
-//
-//	if (get_user(tv.tv_sec, tptr))
-//		return -EFAULT;
-//
-//	tv.tv_nsec = 0;
-//
-//	err = security_settime(&tv, NULL);
-//	if (err)
-//		return err;
-//
-//	do_settimeofday(&tv);
-//	return 0;
-//}
+	do_gettimeofday(&tv);
+	i = tv.tv_sec;
+
+	if (tloc) {
+		if (put_user(i,tloc))
+			return -EFAULT;
+	}
+	force_successful_syscall_return();
+	return i;
+}
+
+COMPAT_SYSCALL_DEFINE1(stime, compat_time_t __user *, tptr)
+{
+	struct timespec tv;
+	int err;
+
+	if (get_user(tv.tv_sec, tptr))
+		return -EFAULT;
+
+	tv.tv_nsec = 0;
+
+	err = security_settime(&tv, NULL);
+	if (err)
+		return err;
+
+	do_settimeofday(&tv);
+	return 0;
+}
 
 #endif /* __ARCH_WANT_COMPAT_SYS_TIME */
 #endif
@@ -225,44 +225,44 @@ SYSCALL_DEFINE2(settimeofday, struct timeval __user *, tv,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(gettimeofday, struct compat_timeval __user *, tv,
-//		       struct timezone __user *, tz)
-//{
-//	if (tv) {
-//		struct timeval ktv;
-//
-//		do_gettimeofday(&ktv);
-//		if (compat_put_timeval(&ktv, tv))
-//			return -EFAULT;
-//	}
-//	if (tz) {
-//		if (copy_to_user(tz, &sys_tz, sizeof(sys_tz)))
-//			return -EFAULT;
-//	}
-//
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE2(gettimeofday, struct compat_timeval __user *, tv,
+		       struct timezone __user *, tz)
+{
+	if (tv) {
+		struct timeval ktv;
 
-//COMPAT_SYSCALL_DEFINE2(settimeofday, struct compat_timeval __user *, tv,
-//		       struct timezone __user *, tz)
-//{
-//	struct timespec64 new_ts;
-//	struct timeval user_tv;
-//	struct timezone new_tz;
-//
-//	if (tv) {
-//		if (compat_get_timeval(&user_tv, tv))
-//			return -EFAULT;
-//		new_ts.tv_sec = user_tv.tv_sec;
-//		new_ts.tv_nsec = user_tv.tv_usec * NSEC_PER_USEC;
-//	}
-//	if (tz) {
-//		if (copy_from_user(&new_tz, tz, sizeof(*tz)))
-//			return -EFAULT;
-//	}
-//
-//	return do_sys_settimeofday64(tv ? &new_ts : NULL, tz ? &new_tz : NULL);
-//}
+		do_gettimeofday(&ktv);
+		if (compat_put_timeval(&ktv, tv))
+			return -EFAULT;
+	}
+	if (tz) {
+		if (copy_to_user(tz, &sys_tz, sizeof(sys_tz)))
+			return -EFAULT;
+	}
+
+	return 0;
+}
+
+COMPAT_SYSCALL_DEFINE2(settimeofday, struct compat_timeval __user *, tv,
+		       struct timezone __user *, tz)
+{
+	struct timespec64 new_ts;
+	struct timeval user_tv;
+	struct timezone new_tz;
+
+	if (tv) {
+		if (compat_get_timeval(&user_tv, tv))
+			return -EFAULT;
+		new_ts.tv_sec = user_tv.tv_sec;
+		new_ts.tv_nsec = user_tv.tv_usec * NSEC_PER_USEC;
+	}
+	if (tz) {
+		if (copy_from_user(&new_tz, tz, sizeof(*tz)))
+			return -EFAULT;
+	}
+
+	return do_sys_settimeofday64(tv ? &new_ts : NULL, tz ? &new_tz : NULL);
+}
 #endif
 
 SYSCALL_DEFINE1(adjtimex, struct timex __user *, txc_p)
@@ -282,23 +282,23 @@ SYSCALL_DEFINE1(adjtimex, struct timex __user *, txc_p)
 
 #ifdef CONFIG_COMPAT
 
-//COMPAT_SYSCALL_DEFINE1(adjtimex, struct compat_timex __user *, utp)
-//{
-//	struct timex txc;
-//	int err, ret;
-//
-//	err = compat_get_timex(&txc, utp);
-//	if (err)
-//		return err;
-//
-//	ret = do_adjtimex(&txc);
-//
-//	err = compat_put_timex(utp, &txc);
-//	if (err)
-//		return err;
-//
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE1(adjtimex, struct compat_timex __user *, utp)
+{
+	struct timex txc;
+	int err, ret;
+
+	err = compat_get_timex(&txc, utp);
+	if (err)
+		return err;
+
+	ret = do_adjtimex(&txc);
+
+	err = compat_put_timex(utp, &txc);
+	if (err)
+		return err;
+
+	return ret;
+}
 #endif
 
 /*

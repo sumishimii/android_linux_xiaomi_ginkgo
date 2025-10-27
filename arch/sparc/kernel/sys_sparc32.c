@@ -144,57 +144,57 @@ asmlinkage long compat_sys_fstatat64(unsigned int dfd,
 	return cp_compat_stat64(&stat, statbuf);
 }
 
-//COMPAT_SYSCALL_DEFINE3(sparc_sigaction, int, sig,
-//			struct compat_old_sigaction __user *,act,
-//			struct compat_old_sigaction __user *,oact)
-//{
-//	WARN_ON_ONCE(sig >= 0);
-//	return compat_sys_sigaction(-sig, act, oact);
-//}
+COMPAT_SYSCALL_DEFINE3(sparc_sigaction, int, sig,
+			struct compat_old_sigaction __user *,act,
+			struct compat_old_sigaction __user *,oact)
+{
+	WARN_ON_ONCE(sig >= 0);
+	return compat_sys_sigaction(-sig, act, oact);
+}
 
-//COMPAT_SYSCALL_DEFINE5(rt_sigaction, int, sig,
-//			struct compat_sigaction __user *,act,
-//			struct compat_sigaction __user *,oact,
-//			void __user *,restorer,
-//			compat_size_t,sigsetsize)
-//{
-//        struct k_sigaction new_ka, old_ka;
-//        int ret;
-//	compat_sigset_t set32;
-//
-//        /* XXX: Don't preclude handling different sized sigset_t's.  */
-//        if (sigsetsize != sizeof(compat_sigset_t))
-//                return -EINVAL;
-//
-//        if (act) {
-//		u32 u_handler, u_restorer;
-//
-//		new_ka.ka_restorer = restorer;
-//		ret = get_user(u_handler, &act->sa_handler);
-//		new_ka.sa.sa_handler =  compat_ptr(u_handler);
-//		ret |= copy_from_user(&set32, &act->sa_mask, sizeof(compat_sigset_t));
-//		sigset_from_compat(&new_ka.sa.sa_mask, &set32);
-//		ret |= get_user(new_ka.sa.sa_flags, &act->sa_flags);
-//		ret |= get_user(u_restorer, &act->sa_restorer);
-//		new_ka.sa.sa_restorer = compat_ptr(u_restorer);
-//                if (ret)
-//                	return -EFAULT;
-//	}
-//
-//	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
-//
-//	if (!ret && oact) {
-//		sigset_to_compat(&set32, &old_ka.sa.sa_mask);
-//		ret = put_user(ptr_to_compat(old_ka.sa.sa_handler), &oact->sa_handler);
-//		ret |= copy_to_user(&oact->sa_mask, &set32, sizeof(compat_sigset_t));
-//		ret |= put_user(old_ka.sa.sa_flags, &oact->sa_flags);
-//		ret |= put_user(ptr_to_compat(old_ka.sa.sa_restorer), &oact->sa_restorer);
-//		if (ret)
-//			ret = -EFAULT;
-//        }
-//
-//        return ret;
-//}
+COMPAT_SYSCALL_DEFINE5(rt_sigaction, int, sig,
+			struct compat_sigaction __user *,act,
+			struct compat_sigaction __user *,oact,
+			void __user *,restorer,
+			compat_size_t,sigsetsize)
+{
+        struct k_sigaction new_ka, old_ka;
+        int ret;
+	compat_sigset_t set32;
+
+        /* XXX: Don't preclude handling different sized sigset_t's.  */
+        if (sigsetsize != sizeof(compat_sigset_t))
+                return -EINVAL;
+
+        if (act) {
+		u32 u_handler, u_restorer;
+
+		new_ka.ka_restorer = restorer;
+		ret = get_user(u_handler, &act->sa_handler);
+		new_ka.sa.sa_handler =  compat_ptr(u_handler);
+		ret |= copy_from_user(&set32, &act->sa_mask, sizeof(compat_sigset_t));
+		sigset_from_compat(&new_ka.sa.sa_mask, &set32);
+		ret |= get_user(new_ka.sa.sa_flags, &act->sa_flags);
+		ret |= get_user(u_restorer, &act->sa_restorer);
+		new_ka.sa.sa_restorer = compat_ptr(u_restorer);
+                if (ret)
+                	return -EFAULT;
+	}
+
+	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
+
+	if (!ret && oact) {
+		sigset_to_compat(&set32, &old_ka.sa.sa_mask);
+		ret = put_user(ptr_to_compat(old_ka.sa.sa_handler), &oact->sa_handler);
+		ret |= copy_to_user(&oact->sa_mask, &set32, sizeof(compat_sigset_t));
+		ret |= put_user(old_ka.sa.sa_flags, &oact->sa_flags);
+		ret |= put_user(ptr_to_compat(old_ka.sa.sa_restorer), &oact->sa_restorer);
+		if (ret)
+			ret = -EFAULT;
+        }
+
+        return ret;
+}
 
 asmlinkage compat_ssize_t sys32_pread64(unsigned int fd,
 					char __user *ubuf,

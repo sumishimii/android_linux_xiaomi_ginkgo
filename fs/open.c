@@ -163,10 +163,10 @@ SYSCALL_DEFINE2(truncate, const char __user *, path, long, length)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(truncate, const char __user *, path, compat_off_t, length)
-//{
-//	return do_sys_truncate(path, length);
-//}
+COMPAT_SYSCALL_DEFINE2(truncate, const char __user *, path, compat_off_t, length)
+{
+	return do_sys_truncate(path, length);
+}
 #endif
 
 static long do_sys_ftruncate(unsigned int fd, loff_t length, int small)
@@ -225,10 +225,10 @@ SYSCALL_DEFINE2(ftruncate, unsigned int, fd, off_t, length)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(ftruncate, unsigned int, fd, compat_off_t, length)
-//{
-//	return do_sys_ftruncate(fd, length, 1);
-//}
+COMPAT_SYSCALL_DEFINE2(ftruncate, unsigned int, fd, compat_off_t, length)
+{
+	return do_sys_ftruncate(fd, length, 1);
+}
 #endif
 
 /* LFS versions of truncate are only needed on 32 bit machines */
@@ -1127,19 +1127,19 @@ SYSCALL_DEFINE4(openat, int, dfd, const char __user *, filename, int, flags,
  * Exactly like sys_open(), except that it doesn't set the
  * O_LARGEFILE flag.
  */
-//COMPAT_SYSCALL_DEFINE3(open, const char __user *, filename, int, flags, umode_t, mode)
-//{
-//	return do_sys_open(AT_FDCWD, filename, flags, mode);
-//}
+COMPAT_SYSCALL_DEFINE3(open, const char __user *, filename, int, flags, umode_t, mode)
+{
+	return do_sys_open(AT_FDCWD, filename, flags, mode);
+}
 
 /*
  * Exactly like sys_openat(), except that it doesn't set the
  * O_LARGEFILE flag.
  */
-//COMPAT_SYSCALL_DEFINE4(openat, int, dfd, const char __user *, filename, int, flags, umode_t, mode)
-//{
-//	return do_sys_open(dfd, filename, flags, mode);
-//}
+COMPAT_SYSCALL_DEFINE4(openat, int, dfd, const char __user *, filename, int, flags, umode_t, mode)
+{
+	return do_sys_open(dfd, filename, flags, mode);
+}
 #endif
 
 #ifndef __alpha__

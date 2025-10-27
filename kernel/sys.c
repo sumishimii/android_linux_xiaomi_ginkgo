@@ -929,24 +929,24 @@ static compat_clock_t clock_t_to_compat_clock_t(clock_t x)
 	return compat_jiffies_to_clock_t(clock_t_to_jiffies(x));
 }
 
-//COMPAT_SYSCALL_DEFINE1(times, struct compat_tms __user *, tbuf)
-//{
-//	if (tbuf) {
-//		struct tms tms;
-//		struct compat_tms tmp;
-//
-//		do_sys_times(&tms);
-//		/* Convert our struct tms to the compat version. */
-//		tmp.tms_utime = clock_t_to_compat_clock_t(tms.tms_utime);
-//		tmp.tms_stime = clock_t_to_compat_clock_t(tms.tms_stime);
-//		tmp.tms_cutime = clock_t_to_compat_clock_t(tms.tms_cutime);
-//		tmp.tms_cstime = clock_t_to_compat_clock_t(tms.tms_cstime);
-//		if (copy_to_user(tbuf, &tmp, sizeof(tmp)))
-//			return -EFAULT;
-//	}
-//	force_successful_syscall_return();
-//	return compat_jiffies_to_clock_t(jiffies);
-//}
+COMPAT_SYSCALL_DEFINE1(times, struct compat_tms __user *, tbuf)
+{
+	if (tbuf) {
+		struct tms tms;
+		struct compat_tms tmp;
+
+		do_sys_times(&tms);
+		/* Convert our struct tms to the compat version. */
+		tmp.tms_utime = clock_t_to_compat_clock_t(tms.tms_utime);
+		tmp.tms_stime = clock_t_to_compat_clock_t(tms.tms_stime);
+		tmp.tms_cutime = clock_t_to_compat_clock_t(tms.tms_cutime);
+		tmp.tms_cstime = clock_t_to_compat_clock_t(tms.tms_cstime);
+		if (copy_to_user(tbuf, &tmp, sizeof(tmp)))
+			return -EFAULT;
+	}
+	force_successful_syscall_return();
+	return compat_jiffies_to_clock_t(jiffies);
+}
 #endif
 
 /*
@@ -1342,49 +1342,49 @@ SYSCALL_DEFINE2(getrlimit, unsigned int, resource, struct rlimit __user *, rlim)
 
 #ifdef CONFIG_COMPAT
 
-//COMPAT_SYSCALL_DEFINE2(setrlimit, unsigned int, resource,
-//		       struct compat_rlimit __user *, rlim)
-//{
-//	struct rlimit r;
-//	struct compat_rlimit r32;
-//
-//	if (copy_from_user(&r32, rlim, sizeof(struct compat_rlimit)))
-//		return -EFAULT;
-//
-//	if (r32.rlim_cur == COMPAT_RLIM_INFINITY)
-//		r.rlim_cur = RLIM_INFINITY;
-//	else
-//		r.rlim_cur = r32.rlim_cur;
-//	if (r32.rlim_max == COMPAT_RLIM_INFINITY)
-//		r.rlim_max = RLIM_INFINITY;
-//	else
-//		r.rlim_max = r32.rlim_max;
-//	return do_prlimit(current, resource, &r, NULL);
-//}
+COMPAT_SYSCALL_DEFINE2(setrlimit, unsigned int, resource,
+		       struct compat_rlimit __user *, rlim)
+{
+	struct rlimit r;
+	struct compat_rlimit r32;
 
-//COMPAT_SYSCALL_DEFINE2(getrlimit, unsigned int, resource,
-//		       struct compat_rlimit __user *, rlim)
-//{
-//	struct rlimit r;
-//	int ret;
-//
-//	ret = do_prlimit(current, resource, NULL, &r);
-//	if (!ret) {
-//		struct compat_rlimit r32;
-//		if (r.rlim_cur > COMPAT_RLIM_INFINITY)
-//			r32.rlim_cur = COMPAT_RLIM_INFINITY;
-//		else
-//			r32.rlim_cur = r.rlim_cur;
-//		if (r.rlim_max > COMPAT_RLIM_INFINITY)
-//			r32.rlim_max = COMPAT_RLIM_INFINITY;
-//		else
-//			r32.rlim_max = r.rlim_max;
-//
-//		if (copy_to_user(rlim, &r32, sizeof(struct compat_rlimit)))
-//			return -EFAULT;
-//	}
-//	return ret;
-//}
+	if (copy_from_user(&r32, rlim, sizeof(struct compat_rlimit)))
+		return -EFAULT;
+
+	if (r32.rlim_cur == COMPAT_RLIM_INFINITY)
+		r.rlim_cur = RLIM_INFINITY;
+	else
+		r.rlim_cur = r32.rlim_cur;
+	if (r32.rlim_max == COMPAT_RLIM_INFINITY)
+		r.rlim_max = RLIM_INFINITY;
+	else
+		r.rlim_max = r32.rlim_max;
+	return do_prlimit(current, resource, &r, NULL);
+}
+
+COMPAT_SYSCALL_DEFINE2(getrlimit, unsigned int, resource,
+		       struct compat_rlimit __user *, rlim)
+{
+	struct rlimit r;
+	int ret;
+
+	ret = do_prlimit(current, resource, NULL, &r);
+	if (!ret) {
+		struct compat_rlimit r32;
+		if (r.rlim_cur > COMPAT_RLIM_INFINITY)
+			r32.rlim_cur = COMPAT_RLIM_INFINITY;
+		else
+			r32.rlim_cur = r.rlim_cur;
+		if (r.rlim_max > COMPAT_RLIM_INFINITY)
+			r32.rlim_max = COMPAT_RLIM_INFINITY;
+		else
+			r32.rlim_max = r.rlim_max;
+
+		if (copy_to_user(rlim, &r32, sizeof(struct compat_rlimit)))
+			return -EFAULT;
+	}
+	return ret;
+}
 
 #endif
 
@@ -1412,28 +1412,28 @@ SYSCALL_DEFINE2(old_getrlimit, unsigned int, resource,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(old_getrlimit, unsigned int, resource,
-//		       struct compat_rlimit __user *, rlim)
-//{
-//	struct rlimit r;
-//
-//	if (resource >= RLIM_NLIMITS)
-//		return -EINVAL;
-//
-//	resource = array_index_nospec(resource, RLIM_NLIMITS);
-//	task_lock(current->group_leader);
-//	r = current->signal->rlim[resource];
-//	task_unlock(current->group_leader);
-//	if (r.rlim_cur > 0x7FFFFFFF)
-//		r.rlim_cur = 0x7FFFFFFF;
-//	if (r.rlim_max > 0x7FFFFFFF)
-//		r.rlim_max = 0x7FFFFFFF;
-//
-//	if (put_user(r.rlim_cur, &rlim->rlim_cur) ||
-//	    put_user(r.rlim_max, &rlim->rlim_max))
-//		return -EFAULT;
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE2(old_getrlimit, unsigned int, resource,
+		       struct compat_rlimit __user *, rlim)
+{
+	struct rlimit r;
+
+	if (resource >= RLIM_NLIMITS)
+		return -EINVAL;
+
+	resource = array_index_nospec(resource, RLIM_NLIMITS);
+	task_lock(current->group_leader);
+	r = current->signal->rlim[resource];
+	task_unlock(current->group_leader);
+	if (r.rlim_cur > 0x7FFFFFFF)
+		r.rlim_cur = 0x7FFFFFFF;
+	if (r.rlim_max > 0x7FFFFFFF)
+		r.rlim_max = 0x7FFFFFFF;
+
+	if (put_user(r.rlim_cur, &rlim->rlim_cur) ||
+	    put_user(r.rlim_max, &rlim->rlim_max))
+		return -EFAULT;
+	return 0;
+}
 #endif
 
 #endif
@@ -1762,17 +1762,17 @@ SYSCALL_DEFINE2(getrusage, int, who, struct rusage __user *, ru)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(getrusage, int, who, struct compat_rusage __user *, ru)
-//{
-//	struct rusage r;
-//
-//	if (who != RUSAGE_SELF && who != RUSAGE_CHILDREN &&
-//	    who != RUSAGE_THREAD)
-//		return -EINVAL;
-//
-//	getrusage(current, who, &r);
-//	return put_compat_rusage(&r, ru);
-//}
+COMPAT_SYSCALL_DEFINE2(getrusage, int, who, struct compat_rusage __user *, ru)
+{
+	struct rusage r;
+
+	if (who != RUSAGE_SELF && who != RUSAGE_CHILDREN &&
+	    who != RUSAGE_THREAD)
+		return -EINVAL;
+
+	getrusage(current, who, &r);
+	return put_compat_rusage(&r, ru);
+}
 #endif
 
 SYSCALL_DEFINE1(umask, int, mask)
@@ -2706,50 +2706,50 @@ struct compat_sysinfo {
 	char _f[20-2*sizeof(u32)-sizeof(int)];
 };
 
-//COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
-//{
-//	struct sysinfo s;
-//
-//	do_sysinfo(&s);
-//
-//	/* Check to see if any memory value is too large for 32-bit and scale
-//	 *  down if needed
-//	 */
-//	if (upper_32_bits(s.totalram) || upper_32_bits(s.totalswap)) {
-//		int bitcount = 0;
-//
-//		while (s.mem_unit < PAGE_SIZE) {
-//			s.mem_unit <<= 1;
-//			bitcount++;
-//		}
-//
-//		s.totalram >>= bitcount;
-//		s.freeram >>= bitcount;
-//		s.sharedram >>= bitcount;
-//		s.bufferram >>= bitcount;
-//		s.totalswap >>= bitcount;
-//		s.freeswap >>= bitcount;
-//		s.totalhigh >>= bitcount;
-//		s.freehigh >>= bitcount;
-//	}
-//
-//	if (!access_ok(VERIFY_WRITE, info, sizeof(struct compat_sysinfo)) ||
-//	    __put_user(s.uptime, &info->uptime) ||
-//	    __put_user(s.loads[0], &info->loads[0]) ||
-//	    __put_user(s.loads[1], &info->loads[1]) ||
-//	    __put_user(s.loads[2], &info->loads[2]) ||
-//	    __put_user(s.totalram, &info->totalram) ||
-//	    __put_user(s.freeram, &info->freeram) ||
-//	    __put_user(s.sharedram, &info->sharedram) ||
-//	    __put_user(s.bufferram, &info->bufferram) ||
-//	    __put_user(s.totalswap, &info->totalswap) ||
-//	    __put_user(s.freeswap, &info->freeswap) ||
-//	    __put_user(s.procs, &info->procs) ||
-//	    __put_user(s.totalhigh, &info->totalhigh) ||
-//	    __put_user(s.freehigh, &info->freehigh) ||
-//	    __put_user(s.mem_unit, &info->mem_unit))
-//		return -EFAULT;
-//
-//	return 0;
-//}
+COMPAT_SYSCALL_DEFINE1(sysinfo, struct compat_sysinfo __user *, info)
+{
+	struct sysinfo s;
+
+	do_sysinfo(&s);
+
+	/* Check to see if any memory value is too large for 32-bit and scale
+	 *  down if needed
+	 */
+	if (upper_32_bits(s.totalram) || upper_32_bits(s.totalswap)) {
+		int bitcount = 0;
+
+		while (s.mem_unit < PAGE_SIZE) {
+			s.mem_unit <<= 1;
+			bitcount++;
+		}
+
+		s.totalram >>= bitcount;
+		s.freeram >>= bitcount;
+		s.sharedram >>= bitcount;
+		s.bufferram >>= bitcount;
+		s.totalswap >>= bitcount;
+		s.freeswap >>= bitcount;
+		s.totalhigh >>= bitcount;
+		s.freehigh >>= bitcount;
+	}
+
+	if (!access_ok(VERIFY_WRITE, info, sizeof(struct compat_sysinfo)) ||
+	    __put_user(s.uptime, &info->uptime) ||
+	    __put_user(s.loads[0], &info->loads[0]) ||
+	    __put_user(s.loads[1], &info->loads[1]) ||
+	    __put_user(s.loads[2], &info->loads[2]) ||
+	    __put_user(s.totalram, &info->totalram) ||
+	    __put_user(s.freeram, &info->freeram) ||
+	    __put_user(s.sharedram, &info->sharedram) ||
+	    __put_user(s.bufferram, &info->bufferram) ||
+	    __put_user(s.totalswap, &info->totalswap) ||
+	    __put_user(s.freeswap, &info->freeswap) ||
+	    __put_user(s.procs, &info->procs) ||
+	    __put_user(s.totalhigh, &info->totalhigh) ||
+	    __put_user(s.freehigh, &info->freehigh) ||
+	    __put_user(s.mem_unit, &info->mem_unit))
+		return -EFAULT;
+
+	return 0;
+}
 #endif /* CONFIG_COMPAT */

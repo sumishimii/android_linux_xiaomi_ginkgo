@@ -2696,42 +2696,42 @@ SYSCALL_DEFINE4(rt_sigprocmask, int, how, sigset_t __user *, nset,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(rt_sigprocmask, int, how, compat_sigset_t __user *, nset,
-//		compat_sigset_t __user *, oset, compat_size_t, sigsetsize)
-//{
-//#ifdef __BIG_ENDIAN
-//	sigset_t old_set = current->blocked;
-//
-//	/* XXX: Don't preclude handling different sized sigset_t's.  */
-//	if (sigsetsize != sizeof(sigset_t))
-//		return -EINVAL;
-//
-//	if (nset) {
-//		compat_sigset_t new32;
-//		sigset_t new_set;
-//		int error;
-//		if (copy_from_user(&new32, nset, sizeof(compat_sigset_t)))
-//			return -EFAULT;
-//
-//		sigset_from_compat(&new_set, &new32);
-//		sigdelsetmask(&new_set, sigmask(SIGKILL)|sigmask(SIGSTOP));
-//
-//		error = sigprocmask(how, &new_set, NULL);
-//		if (error)
-//			return error;
-//	}
-//	if (oset) {
-//		compat_sigset_t old32;
-//		sigset_to_compat(&old32, &old_set);
-//		if (copy_to_user(oset, &old32, sizeof(compat_sigset_t)))
-//			return -EFAULT;
-//	}
-//	return 0;
-//#else
-//	return sys_rt_sigprocmask(how, (sigset_t __user *)nset,
-//				  (sigset_t __user *)oset, sigsetsize);
-//#endif
-//}
+COMPAT_SYSCALL_DEFINE4(rt_sigprocmask, int, how, compat_sigset_t __user *, nset,
+		compat_sigset_t __user *, oset, compat_size_t, sigsetsize)
+{
+#ifdef __BIG_ENDIAN
+	sigset_t old_set = current->blocked;
+
+	/* XXX: Don't preclude handling different sized sigset_t's.  */
+	if (sigsetsize != sizeof(sigset_t))
+		return -EINVAL;
+
+	if (nset) {
+		compat_sigset_t new32;
+		sigset_t new_set;
+		int error;
+		if (copy_from_user(&new32, nset, sizeof(compat_sigset_t)))
+			return -EFAULT;
+
+		sigset_from_compat(&new_set, &new32);
+		sigdelsetmask(&new_set, sigmask(SIGKILL)|sigmask(SIGSTOP));
+
+		error = sigprocmask(how, &new_set, NULL);
+		if (error)
+			return error;
+	}
+	if (oset) {
+		compat_sigset_t old32;
+		sigset_to_compat(&old32, &old_set);
+		if (copy_to_user(oset, &old32, sizeof(compat_sigset_t)))
+			return -EFAULT;
+	}
+	return 0;
+#else
+	return sys_rt_sigprocmask(how, (sigset_t __user *)nset,
+				  (sigset_t __user *)oset, sigsetsize);
+#endif
+}
 #endif
 
 static int do_sigpending(void *set, unsigned long sigsetsize)
@@ -2765,24 +2765,24 @@ SYSCALL_DEFINE2(rt_sigpending, sigset_t __user *, uset, size_t, sigsetsize)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(rt_sigpending, compat_sigset_t __user *, uset,
-//		compat_size_t, sigsetsize)
-//{
-//#ifdef __BIG_ENDIAN
-//	sigset_t set;
-//	int err = do_sigpending(&set, sigsetsize);
-//	if (!err) {
-//		compat_sigset_t set32;
-//		sigset_to_compat(&set32, &set);
-//		/* we can get here only if sigsetsize <= sizeof(set) */
-//		if (copy_to_user(uset, &set32, sigsetsize))
-//			err = -EFAULT;
-//	}
-//	return err;
-//#else
-//	return sys_rt_sigpending((sigset_t __user *)uset, sigsetsize);
-//#endif
-//}
+COMPAT_SYSCALL_DEFINE2(rt_sigpending, compat_sigset_t __user *, uset,
+		compat_size_t, sigsetsize)
+{
+#ifdef __BIG_ENDIAN
+	sigset_t set;
+	int err = do_sigpending(&set, sigsetsize);
+	if (!err) {
+		compat_sigset_t set32;
+		sigset_to_compat(&set32, &set);
+		/* we can get here only if sigsetsize <= sizeof(set) */
+		if (copy_to_user(uset, &set32, sigsetsize))
+			err = -EFAULT;
+	}
+	return err;
+#else
+	return sys_rt_sigpending((sigset_t __user *)uset, sigsetsize);
+#endif
+}
 #endif
 
 enum siginfo_layout siginfo_layout(unsigned sig, int si_code)
@@ -3011,37 +3011,37 @@ SYSCALL_DEFINE4(rt_sigtimedwait, const sigset_t __user *, uthese,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(rt_sigtimedwait, compat_sigset_t __user *, uthese,
-//		struct compat_siginfo __user *, uinfo,
-//		struct compat_timespec __user *, uts, compat_size_t, sigsetsize)
-//{
-//	compat_sigset_t s32;
-//	sigset_t s;
-//	struct timespec t;
-//	siginfo_t info;
-//	long ret;
-//
-//	if (sigsetsize != sizeof(sigset_t))
-//		return -EINVAL;
-//
-//	if (copy_from_user(&s32, uthese, sizeof(compat_sigset_t)))
-//		return -EFAULT;
-//	sigset_from_compat(&s, &s32);
-//
-//	if (uts) {
-//		if (compat_get_timespec(&t, uts))
-//			return -EFAULT;
-//	}
-//
-//	ret = do_sigtimedwait(&s, &info, uts ? &t : NULL);
-//
-//	if (ret > 0 && uinfo) {
-//		if (copy_siginfo_to_user32(uinfo, &info))
-//			ret = -EFAULT;
-//	}
-//
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE4(rt_sigtimedwait, compat_sigset_t __user *, uthese,
+		struct compat_siginfo __user *, uinfo,
+		struct compat_timespec __user *, uts, compat_size_t, sigsetsize)
+{
+	compat_sigset_t s32;
+	sigset_t s;
+	struct timespec t;
+	siginfo_t info;
+	long ret;
+
+	if (sigsetsize != sizeof(sigset_t))
+		return -EINVAL;
+
+	if (copy_from_user(&s32, uthese, sizeof(compat_sigset_t)))
+		return -EFAULT;
+	sigset_from_compat(&s, &s32);
+
+	if (uts) {
+		if (compat_get_timespec(&t, uts))
+			return -EFAULT;
+	}
+
+	ret = do_sigtimedwait(&s, &info, uts ? &t : NULL);
+
+	if (ret > 0 && uinfo) {
+		if (copy_siginfo_to_user32(uinfo, &info))
+			ret = -EFAULT;
+	}
+
+	return ret;
+}
 #endif
 
 static inline void prepare_kill_siginfo(int sig, struct siginfo *info)
@@ -3290,17 +3290,17 @@ SYSCALL_DEFINE3(rt_sigqueueinfo, pid_t, pid, int, sig,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE3(rt_sigqueueinfo,
-//			compat_pid_t, pid,
-//			int, sig,
-//			struct compat_siginfo __user *, uinfo)
-//{
-//	siginfo_t info = {};
-//	int ret = copy_siginfo_from_user32(&info, uinfo);
-//	if (unlikely(ret))
-//		return ret;
-//	return do_rt_sigqueueinfo(pid, sig, &info);
-//}
+COMPAT_SYSCALL_DEFINE3(rt_sigqueueinfo,
+			compat_pid_t, pid,
+			int, sig,
+			struct compat_siginfo __user *, uinfo)
+{
+	siginfo_t info = {};
+	int ret = copy_siginfo_from_user32(&info, uinfo);
+	if (unlikely(ret))
+		return ret;
+	return do_rt_sigqueueinfo(pid, sig, &info);
+}
 #endif
 
 static int do_rt_tgsigqueueinfo(pid_t tgid, pid_t pid, int sig, siginfo_t *info)
@@ -3333,18 +3333,18 @@ SYSCALL_DEFINE4(rt_tgsigqueueinfo, pid_t, tgid, pid_t, pid, int, sig,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(rt_tgsigqueueinfo,
-//			compat_pid_t, tgid,
-//			compat_pid_t, pid,
-//			int, sig,
-//			struct compat_siginfo __user *, uinfo)
-//{
-//	siginfo_t info = {};
-//
-//	if (copy_siginfo_from_user32(&info, uinfo))
-//		return -EFAULT;
-//	return do_rt_tgsigqueueinfo(tgid, pid, sig, &info);
-//}
+COMPAT_SYSCALL_DEFINE4(rt_tgsigqueueinfo,
+			compat_pid_t, tgid,
+			compat_pid_t, pid,
+			int, sig,
+			struct compat_siginfo __user *, uinfo)
+{
+	siginfo_t info = {};
+
+	if (copy_siginfo_from_user32(&info, uinfo))
+		return -EFAULT;
+	return do_rt_tgsigqueueinfo(tgid, pid, sig, &info);
+}
 #endif
 
 /*
@@ -3500,35 +3500,35 @@ int __save_altstack(stack_t __user *uss, unsigned long sp)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(sigaltstack,
-//			const compat_stack_t __user *, uss_ptr,
-//			compat_stack_t __user *, uoss_ptr)
-//{
-//	stack_t uss, uoss;
-//	int ret;
-//
-//	if (uss_ptr) {
-//		compat_stack_t uss32;
-//		if (copy_from_user(&uss32, uss_ptr, sizeof(compat_stack_t)))
-//			return -EFAULT;
-//		uss.ss_sp = compat_ptr(uss32.ss_sp);
-//		uss.ss_flags = uss32.ss_flags;
-//		uss.ss_size = uss32.ss_size;
-//	}
-//	ret = do_sigaltstack(uss_ptr ? &uss : NULL, &uoss,
-//			     compat_user_stack_pointer(),
-//			     COMPAT_MINSIGSTKSZ);
-//	if (ret >= 0 && uoss_ptr)  {
-//		compat_stack_t old;
-//		memset(&old, 0, sizeof(old));
-//		old.ss_sp = ptr_to_compat(uoss.ss_sp);
-//		old.ss_flags = uoss.ss_flags;
-//		old.ss_size = uoss.ss_size;
-//		if (copy_to_user(uoss_ptr, &old, sizeof(compat_stack_t)))
-//			ret = -EFAULT;
-//	}
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE2(sigaltstack,
+			const compat_stack_t __user *, uss_ptr,
+			compat_stack_t __user *, uoss_ptr)
+{
+	stack_t uss, uoss;
+	int ret;
+
+	if (uss_ptr) {
+		compat_stack_t uss32;
+		if (copy_from_user(&uss32, uss_ptr, sizeof(compat_stack_t)))
+			return -EFAULT;
+		uss.ss_sp = compat_ptr(uss32.ss_sp);
+		uss.ss_flags = uss32.ss_flags;
+		uss.ss_size = uss32.ss_size;
+	}
+	ret = do_sigaltstack(uss_ptr ? &uss : NULL, &uoss,
+			     compat_user_stack_pointer(),
+			     COMPAT_MINSIGSTKSZ);
+	if (ret >= 0 && uoss_ptr)  {
+		compat_stack_t old;
+		memset(&old, 0, sizeof(old));
+		old.ss_sp = ptr_to_compat(uoss.ss_sp);
+		old.ss_flags = uoss.ss_flags;
+		old.ss_size = uoss.ss_size;
+		if (copy_to_user(uoss_ptr, &old, sizeof(compat_stack_t)))
+			ret = -EFAULT;
+	}
+	return ret;
+}
 
 int compat_restore_altstack(const compat_stack_t __user *uss)
 {
@@ -3565,18 +3565,18 @@ SYSCALL_DEFINE1(sigpending, old_sigset_t __user *, set)
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE1(sigpending, compat_old_sigset_t __user *, set32)
-//{
-//#ifdef __BIG_ENDIAN
-//	sigset_t set;
-//	int err = do_sigpending(&set, sizeof(set.sig[0]));
-//	if (!err)
-//		err = put_user(set.sig[0], set32);
-//	return err;
-//#else
-//	return sys_rt_sigpending((sigset_t __user *)set32, sizeof(*set32));
-//#endif
-//}
+COMPAT_SYSCALL_DEFINE1(sigpending, compat_old_sigset_t __user *, set32)
+{
+#ifdef __BIG_ENDIAN
+	sigset_t set;
+	int err = do_sigpending(&set, sizeof(set.sig[0]));
+	if (!err)
+		err = put_user(set.sig[0], set32);
+	return err;
+#else
+	return sys_rt_sigpending((sigset_t __user *)set32, sizeof(*set32));
+#endif
+}
 #endif
 
 #endif
@@ -3667,51 +3667,51 @@ out:
 	return ret;
 }
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(rt_sigaction, int, sig,
-//		const struct compat_sigaction __user *, act,
-//		struct compat_sigaction __user *, oact,
-//		compat_size_t, sigsetsize)
-//{
-//	struct k_sigaction new_ka, old_ka;
-//	compat_sigset_t mask;
-//#ifdef __ARCH_HAS_SA_RESTORER
-//	compat_uptr_t restorer;
-//#endif
-//	int ret;
-//
-//	/* XXX: Don't preclude handling different sized sigset_t's.  */
-//	if (sigsetsize != sizeof(compat_sigset_t))
-//		return -EINVAL;
-//
-//	if (act) {
-//		compat_uptr_t handler;
-//		ret = get_user(handler, &act->sa_handler);
-//		new_ka.sa.sa_handler = compat_ptr(handler);
-//#ifdef __ARCH_HAS_SA_RESTORER
-//		ret |= get_user(restorer, &act->sa_restorer);
-//		new_ka.sa.sa_restorer = compat_ptr(restorer);
-//#endif
-//		ret |= copy_from_user(&mask, &act->sa_mask, sizeof(mask));
-//		ret |= get_user(new_ka.sa.sa_flags, &act->sa_flags);
-//		if (ret)
-//			return -EFAULT;
-//		sigset_from_compat(&new_ka.sa.sa_mask, &mask);
-//	}
-//
-//	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
-//	if (!ret && oact) {
-//		sigset_to_compat(&mask, &old_ka.sa.sa_mask);
-//		ret = put_user(ptr_to_compat(old_ka.sa.sa_handler), 
-//			       &oact->sa_handler);
-//		ret |= copy_to_user(&oact->sa_mask, &mask, sizeof(mask));
-//		ret |= put_user(old_ka.sa.sa_flags, &oact->sa_flags);
-//#ifdef __ARCH_HAS_SA_RESTORER
-//		ret |= put_user(ptr_to_compat(old_ka.sa.sa_restorer),
-//				&oact->sa_restorer);
-//#endif
-//	}
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE4(rt_sigaction, int, sig,
+		const struct compat_sigaction __user *, act,
+		struct compat_sigaction __user *, oact,
+		compat_size_t, sigsetsize)
+{
+	struct k_sigaction new_ka, old_ka;
+	compat_sigset_t mask;
+#ifdef __ARCH_HAS_SA_RESTORER
+	compat_uptr_t restorer;
+#endif
+	int ret;
+
+	/* XXX: Don't preclude handling different sized sigset_t's.  */
+	if (sigsetsize != sizeof(compat_sigset_t))
+		return -EINVAL;
+
+	if (act) {
+		compat_uptr_t handler;
+		ret = get_user(handler, &act->sa_handler);
+		new_ka.sa.sa_handler = compat_ptr(handler);
+#ifdef __ARCH_HAS_SA_RESTORER
+		ret |= get_user(restorer, &act->sa_restorer);
+		new_ka.sa.sa_restorer = compat_ptr(restorer);
+#endif
+		ret |= copy_from_user(&mask, &act->sa_mask, sizeof(mask));
+		ret |= get_user(new_ka.sa.sa_flags, &act->sa_flags);
+		if (ret)
+			return -EFAULT;
+		sigset_from_compat(&new_ka.sa.sa_mask, &mask);
+	}
+
+	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
+	if (!ret && oact) {
+		sigset_to_compat(&mask, &old_ka.sa.sa_mask);
+		ret = put_user(ptr_to_compat(old_ka.sa.sa_handler), 
+			       &oact->sa_handler);
+		ret |= copy_to_user(&oact->sa_mask, &mask, sizeof(mask));
+		ret |= put_user(old_ka.sa.sa_flags, &oact->sa_flags);
+#ifdef __ARCH_HAS_SA_RESTORER
+		ret |= put_user(ptr_to_compat(old_ka.sa.sa_restorer),
+				&oact->sa_restorer);
+#endif
+	}
+	return ret;
+}
 #endif
 #endif /* !CONFIG_ODD_RT_SIGACTION */
 
@@ -3752,45 +3752,45 @@ SYSCALL_DEFINE3(sigaction, int, sig,
 }
 #endif
 #ifdef CONFIG_COMPAT_OLD_SIGACTION
-//COMPAT_SYSCALL_DEFINE3(sigaction, int, sig,
-//		const struct compat_old_sigaction __user *, act,
-//	        struct compat_old_sigaction __user *, oact)
-//{
-//	struct k_sigaction new_ka, old_ka;
-//	int ret;
-//	compat_old_sigset_t mask;
-//	compat_uptr_t handler, restorer;
-//
-//	if (act) {
-//		if (!access_ok(VERIFY_READ, act, sizeof(*act)) ||
-//		    __get_user(handler, &act->sa_handler) ||
-//		    __get_user(restorer, &act->sa_restorer) ||
-//		    __get_user(new_ka.sa.sa_flags, &act->sa_flags) ||
-//		    __get_user(mask, &act->sa_mask))
-//			return -EFAULT;
-//
-//#ifdef __ARCH_HAS_KA_RESTORER
-//		new_ka.ka_restorer = NULL;
-//#endif
-//		new_ka.sa.sa_handler = compat_ptr(handler);
-//		new_ka.sa.sa_restorer = compat_ptr(restorer);
-//		siginitset(&new_ka.sa.sa_mask, mask);
-//	}
-//
-//	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
-//
-//	if (!ret && oact) {
-//		if (!access_ok(VERIFY_WRITE, oact, sizeof(*oact)) ||
-//		    __put_user(ptr_to_compat(old_ka.sa.sa_handler),
-//			       &oact->sa_handler) ||
-//		    __put_user(ptr_to_compat(old_ka.sa.sa_restorer),
-//			       &oact->sa_restorer) ||
-//		    __put_user(old_ka.sa.sa_flags, &oact->sa_flags) ||
-//		    __put_user(old_ka.sa.sa_mask.sig[0], &oact->sa_mask))
-//			return -EFAULT;
-//	}
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE3(sigaction, int, sig,
+		const struct compat_old_sigaction __user *, act,
+	        struct compat_old_sigaction __user *, oact)
+{
+	struct k_sigaction new_ka, old_ka;
+	int ret;
+	compat_old_sigset_t mask;
+	compat_uptr_t handler, restorer;
+
+	if (act) {
+		if (!access_ok(VERIFY_READ, act, sizeof(*act)) ||
+		    __get_user(handler, &act->sa_handler) ||
+		    __get_user(restorer, &act->sa_restorer) ||
+		    __get_user(new_ka.sa.sa_flags, &act->sa_flags) ||
+		    __get_user(mask, &act->sa_mask))
+			return -EFAULT;
+
+#ifdef __ARCH_HAS_KA_RESTORER
+		new_ka.ka_restorer = NULL;
+#endif
+		new_ka.sa.sa_handler = compat_ptr(handler);
+		new_ka.sa.sa_restorer = compat_ptr(restorer);
+		siginitset(&new_ka.sa.sa_mask, mask);
+	}
+
+	ret = do_sigaction(sig, act ? &new_ka : NULL, oact ? &old_ka : NULL);
+
+	if (!ret && oact) {
+		if (!access_ok(VERIFY_WRITE, oact, sizeof(*oact)) ||
+		    __put_user(ptr_to_compat(old_ka.sa.sa_handler),
+			       &oact->sa_handler) ||
+		    __put_user(ptr_to_compat(old_ka.sa.sa_restorer),
+			       &oact->sa_restorer) ||
+		    __put_user(old_ka.sa.sa_flags, &oact->sa_flags) ||
+		    __put_user(old_ka.sa.sa_mask.sig[0], &oact->sa_mask))
+			return -EFAULT;
+	}
+	return ret;
+}
 #endif
 
 #ifdef CONFIG_SGETMASK_SYSCALL
@@ -3881,25 +3881,25 @@ SYSCALL_DEFINE2(rt_sigsuspend, sigset_t __user *, unewset, size_t, sigsetsize)
 }
  
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(rt_sigsuspend, compat_sigset_t __user *, unewset, compat_size_t, sigsetsize)
-//{
-//#ifdef __BIG_ENDIAN
-//	sigset_t newset;
-//	compat_sigset_t newset32;
-//
-//	/* XXX: Don't preclude handling different sized sigset_t's.  */
-//	if (sigsetsize != sizeof(sigset_t))
-//		return -EINVAL;
-//
-//	if (copy_from_user(&newset32, unewset, sizeof(compat_sigset_t)))
-//		return -EFAULT;
-//	sigset_from_compat(&newset, &newset32);
-//	return sigsuspend(&newset);
-//#else
-//	/* on little-endian bitmaps don't care about granularity */
-//	return sys_rt_sigsuspend((sigset_t __user *)unewset, sigsetsize);
-//#endif
-//}
+COMPAT_SYSCALL_DEFINE2(rt_sigsuspend, compat_sigset_t __user *, unewset, compat_size_t, sigsetsize)
+{
+#ifdef __BIG_ENDIAN
+	sigset_t newset;
+	compat_sigset_t newset32;
+
+	/* XXX: Don't preclude handling different sized sigset_t's.  */
+	if (sigsetsize != sizeof(sigset_t))
+		return -EINVAL;
+
+	if (copy_from_user(&newset32, unewset, sizeof(compat_sigset_t)))
+		return -EFAULT;
+	sigset_from_compat(&newset, &newset32);
+	return sigsuspend(&newset);
+#else
+	/* on little-endian bitmaps don't care about granularity */
+	return sys_rt_sigsuspend((sigset_t __user *)unewset, sigsetsize);
+#endif
+}
 #endif
 
 #ifdef CONFIG_OLD_SIGSUSPEND

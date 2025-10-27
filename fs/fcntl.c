@@ -607,85 +607,85 @@ static int fixup_compat_flock(struct flock *flock)
 	return 0;
 }
 
-//COMPAT_SYSCALL_DEFINE3(fcntl64, unsigned int, fd, unsigned int, cmd,
-//		       compat_ulong_t, arg)
-//{
-//	struct fd f = fdget_raw(fd);
-//	struct flock flock;
-//	long err = -EBADF;
-//
-//	if (!f.file)
-//		return err;
-//
-//	if (unlikely(f.file->f_mode & FMODE_PATH)) {
-//		if (!check_fcntl_cmd(cmd))
-//			goto out_put;
-//	}
-//
-//	err = security_file_fcntl(f.file, cmd, arg);
-//	if (err)
-//		goto out_put;
-//
-//	switch (cmd) {
-//	case F_GETLK:
-//		err = get_compat_flock(&flock, compat_ptr(arg));
-//		if (err)
-//			break;
-//		err = fcntl_getlk(f.file, convert_fcntl_cmd(cmd), &flock);
-//		if (err)
-//			break;
-//		err = fixup_compat_flock(&flock);
-//		if (!err)
-//			err = put_compat_flock(&flock, compat_ptr(arg));
-//		break;
-//	case F_GETLK64:
-//	case F_OFD_GETLK:
-//		err = get_compat_flock64(&flock, compat_ptr(arg));
-//		if (err)
-//			break;
-//		err = fcntl_getlk(f.file, convert_fcntl_cmd(cmd), &flock);
-//		if (!err)
-//			err = put_compat_flock64(&flock, compat_ptr(arg));
-//		break;
-//	case F_SETLK:
-//	case F_SETLKW:
-//		err = get_compat_flock(&flock, compat_ptr(arg));
-//		if (err)
-//			break;
-//		err = fcntl_setlk(fd, f.file, convert_fcntl_cmd(cmd), &flock);
-//		break;
-//	case F_SETLK64:
-//	case F_SETLKW64:
-//	case F_OFD_SETLK:
-//	case F_OFD_SETLKW:
-//		err = get_compat_flock64(&flock, compat_ptr(arg));
-//		if (err)
-//			break;
-//		err = fcntl_setlk(fd, f.file, convert_fcntl_cmd(cmd), &flock);
-//		break;
-//	default:
-//		err = do_fcntl(fd, cmd, arg, f.file);
-//		break;
-//	}
-//out_put:
-//	fdput(f);
-//	return err;
-//}
+COMPAT_SYSCALL_DEFINE3(fcntl64, unsigned int, fd, unsigned int, cmd,
+		       compat_ulong_t, arg)
+{
+	struct fd f = fdget_raw(fd);
+	struct flock flock;
+	long err = -EBADF;
 
-//COMPAT_SYSCALL_DEFINE3(fcntl, unsigned int, fd, unsigned int, cmd,
-//		       compat_ulong_t, arg)
-//{
-//	switch (cmd) {
-//	case F_GETLK64:
-//	case F_SETLK64:
-//	case F_SETLKW64:
-//	case F_OFD_GETLK:
-//	case F_OFD_SETLK:
-//	case F_OFD_SETLKW:
-//		return -EINVAL;
-//	}
-//	return compat_sys_fcntl64(fd, cmd, arg);
-//}
+	if (!f.file)
+		return err;
+
+	if (unlikely(f.file->f_mode & FMODE_PATH)) {
+		if (!check_fcntl_cmd(cmd))
+			goto out_put;
+	}
+
+	err = security_file_fcntl(f.file, cmd, arg);
+	if (err)
+		goto out_put;
+
+	switch (cmd) {
+	case F_GETLK:
+		err = get_compat_flock(&flock, compat_ptr(arg));
+		if (err)
+			break;
+		err = fcntl_getlk(f.file, convert_fcntl_cmd(cmd), &flock);
+		if (err)
+			break;
+		err = fixup_compat_flock(&flock);
+		if (!err)
+			err = put_compat_flock(&flock, compat_ptr(arg));
+		break;
+	case F_GETLK64:
+	case F_OFD_GETLK:
+		err = get_compat_flock64(&flock, compat_ptr(arg));
+		if (err)
+			break;
+		err = fcntl_getlk(f.file, convert_fcntl_cmd(cmd), &flock);
+		if (!err)
+			err = put_compat_flock64(&flock, compat_ptr(arg));
+		break;
+	case F_SETLK:
+	case F_SETLKW:
+		err = get_compat_flock(&flock, compat_ptr(arg));
+		if (err)
+			break;
+		err = fcntl_setlk(fd, f.file, convert_fcntl_cmd(cmd), &flock);
+		break;
+	case F_SETLK64:
+	case F_SETLKW64:
+	case F_OFD_SETLK:
+	case F_OFD_SETLKW:
+		err = get_compat_flock64(&flock, compat_ptr(arg));
+		if (err)
+			break;
+		err = fcntl_setlk(fd, f.file, convert_fcntl_cmd(cmd), &flock);
+		break;
+	default:
+		err = do_fcntl(fd, cmd, arg, f.file);
+		break;
+	}
+out_put:
+	fdput(f);
+	return err;
+}
+
+COMPAT_SYSCALL_DEFINE3(fcntl, unsigned int, fd, unsigned int, cmd,
+		       compat_ulong_t, arg)
+{
+	switch (cmd) {
+	case F_GETLK64:
+	case F_SETLK64:
+	case F_SETLKW64:
+	case F_OFD_GETLK:
+	case F_OFD_SETLK:
+	case F_OFD_SETLKW:
+		return -EINVAL;
+	}
+	return compat_sys_fcntl64(fd, cmd, arg);
+}
 #endif
 
 /* Table to convert sigio signal codes into poll band bitmaps */

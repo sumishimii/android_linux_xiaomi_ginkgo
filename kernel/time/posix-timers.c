@@ -601,19 +601,19 @@ SYSCALL_DEFINE3(timer_create, const clockid_t, which_clock,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE3(timer_create, clockid_t, which_clock,
-//		       struct compat_sigevent __user *, timer_event_spec,
-//		       timer_t __user *, created_timer_id)
-//{
-//	if (timer_event_spec) {
-//		sigevent_t event;
-//
-//		if (get_compat_sigevent(&event, timer_event_spec))
-//			return -EFAULT;
-//		return do_timer_create(which_clock, &event, created_timer_id);
-//	}
-//	return do_timer_create(which_clock, NULL, created_timer_id);
-//}
+COMPAT_SYSCALL_DEFINE3(timer_create, clockid_t, which_clock,
+		       struct compat_sigevent __user *, timer_event_spec,
+		       timer_t __user *, created_timer_id)
+{
+	if (timer_event_spec) {
+		sigevent_t event;
+
+		if (get_compat_sigevent(&event, timer_event_spec))
+			return -EFAULT;
+		return do_timer_create(which_clock, &event, created_timer_id);
+	}
+	return do_timer_create(which_clock, NULL, created_timer_id);
+}
 #endif
 
 /*
@@ -767,18 +767,18 @@ SYSCALL_DEFINE2(timer_gettime, timer_t, timer_id,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE2(timer_gettime, timer_t, timer_id,
-//		       struct compat_itimerspec __user *, setting)
-//{
-//	struct itimerspec64 cur_setting;
-//
-//	int ret = do_timer_gettime(timer_id, &cur_setting);
-//	if (!ret) {
-//		if (put_compat_itimerspec64(&cur_setting, setting))
-//			ret = -EFAULT;
-//	}
-//	return ret;
-//}
+COMPAT_SYSCALL_DEFINE2(timer_gettime, timer_t, timer_id,
+		       struct compat_itimerspec __user *, setting)
+{
+	struct itimerspec64 cur_setting;
+
+	int ret = do_timer_gettime(timer_id, &cur_setting);
+	if (!ret) {
+		if (put_compat_itimerspec64(&cur_setting, setting))
+			ret = -EFAULT;
+	}
+	return ret;
+}
 #endif
 
 /*
@@ -939,26 +939,26 @@ SYSCALL_DEFINE4(timer_settime, timer_t, timer_id, int, flags,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(timer_settime, timer_t, timer_id, int, flags,
-//		       struct compat_itimerspec __user *, new,
-//		       struct compat_itimerspec __user *, old)
-//{
-//	struct itimerspec64 new_spec, old_spec;
-//	struct itimerspec64 *rtn = old ? &old_spec : NULL;
-//	int error = 0;
-//
-//	if (!new)
-//		return -EINVAL;
-//	if (get_compat_itimerspec64(&new_spec, new))
-//		return -EFAULT;
-//
-//	error = do_timer_settime(timer_id, flags, &new_spec, rtn);
-//	if (!error && old) {
-//		if (put_compat_itimerspec64(&old_spec, old))
-//			error = -EFAULT;
-//	}
-//	return error;
-//}
+COMPAT_SYSCALL_DEFINE4(timer_settime, timer_t, timer_id, int, flags,
+		       struct compat_itimerspec __user *, new,
+		       struct compat_itimerspec __user *, old)
+{
+	struct itimerspec64 new_spec, old_spec;
+	struct itimerspec64 *rtn = old ? &old_spec : NULL;
+	int error = 0;
+
+	if (!new)
+		return -EINVAL;
+	if (get_compat_itimerspec64(&new_spec, new))
+		return -EFAULT;
+
+	error = do_timer_settime(timer_id, flags, &new_spec, rtn);
+	if (!error && old) {
+		if (put_compat_itimerspec64(&old_spec, old))
+			error = -EFAULT;
+	}
+	return error;
+}
 #endif
 
 int common_timer_del(struct k_itimer *timer)
@@ -1126,79 +1126,79 @@ SYSCALL_DEFINE2(clock_getres, const clockid_t, which_clock,
 
 #ifdef CONFIG_COMPAT
 
-//COMPAT_SYSCALL_DEFINE2(clock_settime, clockid_t, which_clock,
-//		       struct compat_timespec __user *, tp)
-//{
-//	const struct k_clock *kc = clockid_to_kclock(which_clock);
-//	struct timespec64 ts;
-//
-//	if (!kc || !kc->clock_set)
-//		return -EINVAL;
-//
-//	if (compat_get_timespec64(&ts, tp))
-//		return -EFAULT;
-//
-//	return kc->clock_set(which_clock, &ts);
-//}
+COMPAT_SYSCALL_DEFINE2(clock_settime, clockid_t, which_clock,
+		       struct compat_timespec __user *, tp)
+{
+	const struct k_clock *kc = clockid_to_kclock(which_clock);
+	struct timespec64 ts;
 
-//COMPAT_SYSCALL_DEFINE2(clock_gettime, clockid_t, which_clock,
-//		       struct compat_timespec __user *, tp)
-//{
-//	const struct k_clock *kc = clockid_to_kclock(which_clock);
-//	struct timespec64 ts;
-//	int err;
-//
-//	if (!kc)
-//		return -EINVAL;
-//
-//	err = kc->clock_get(which_clock, &ts);
-//
-//	if (!err && compat_put_timespec64(&ts, tp))
-//		err = -EFAULT;
-//
-//	return err;
-//}
+	if (!kc || !kc->clock_set)
+		return -EINVAL;
 
-//COMPAT_SYSCALL_DEFINE2(clock_adjtime, clockid_t, which_clock,
-//		       struct compat_timex __user *, utp)
-//{
-//	const struct k_clock *kc = clockid_to_kclock(which_clock);
-//	struct timex ktx;
-//	int err;
-//
-//	if (!kc)
-//		return -EINVAL;
-//	if (!kc->clock_adj)
-//		return -EOPNOTSUPP;
-//
-//	err = compat_get_timex(&ktx, utp);
-//	if (err)
-//		return err;
-//
-//	err = kc->clock_adj(which_clock, &ktx);
-//
-//	if (err >= 0 && compat_put_timex(utp, &ktx))
-//		return -EFAULT;
-//
-//	return err;
-//}
+	if (compat_get_timespec64(&ts, tp))
+		return -EFAULT;
 
-//COMPAT_SYSCALL_DEFINE2(clock_getres, clockid_t, which_clock,
-//		       struct compat_timespec __user *, tp)
-//{
-//	const struct k_clock *kc = clockid_to_kclock(which_clock);
-//	struct timespec64 ts;
-//	int err;
-//
-//	if (!kc)
-//		return -EINVAL;
-//
-//	err = kc->clock_getres(which_clock, &ts);
-//	if (!err && tp && compat_put_timespec64(&ts, tp))
-//		return -EFAULT;
-//
-//	return err;
-//}
+	return kc->clock_set(which_clock, &ts);
+}
+
+COMPAT_SYSCALL_DEFINE2(clock_gettime, clockid_t, which_clock,
+		       struct compat_timespec __user *, tp)
+{
+	const struct k_clock *kc = clockid_to_kclock(which_clock);
+	struct timespec64 ts;
+	int err;
+
+	if (!kc)
+		return -EINVAL;
+
+	err = kc->clock_get(which_clock, &ts);
+
+	if (!err && compat_put_timespec64(&ts, tp))
+		err = -EFAULT;
+
+	return err;
+}
+
+COMPAT_SYSCALL_DEFINE2(clock_adjtime, clockid_t, which_clock,
+		       struct compat_timex __user *, utp)
+{
+	const struct k_clock *kc = clockid_to_kclock(which_clock);
+	struct timex ktx;
+	int err;
+
+	if (!kc)
+		return -EINVAL;
+	if (!kc->clock_adj)
+		return -EOPNOTSUPP;
+
+	err = compat_get_timex(&ktx, utp);
+	if (err)
+		return err;
+
+	err = kc->clock_adj(which_clock, &ktx);
+
+	if (err >= 0 && compat_put_timex(utp, &ktx))
+		return -EFAULT;
+
+	return err;
+}
+
+COMPAT_SYSCALL_DEFINE2(clock_getres, clockid_t, which_clock,
+		       struct compat_timespec __user *, tp)
+{
+	const struct k_clock *kc = clockid_to_kclock(which_clock);
+	struct timespec64 ts;
+	int err;
+
+	if (!kc)
+		return -EINVAL;
+
+	err = kc->clock_getres(which_clock, &ts);
+	if (!err && tp && compat_put_timespec64(&ts, tp))
+		return -EFAULT;
+
+	return err;
+}
 
 #endif
 
@@ -1240,31 +1240,31 @@ SYSCALL_DEFINE4(clock_nanosleep, const clockid_t, which_clock, int, flags,
 }
 
 #ifdef CONFIG_COMPAT
-//COMPAT_SYSCALL_DEFINE4(clock_nanosleep, clockid_t, which_clock, int, flags,
-//		       struct compat_timespec __user *, rqtp,
-//		       struct compat_timespec __user *, rmtp)
-//{
-//	const struct k_clock *kc = clockid_to_kclock(which_clock);
-//	struct timespec64 t;
-//
-//	if (!kc)
-//		return -EINVAL;
-//	if (!kc->nsleep)
-//		return -ENANOSLEEP_NOTSUP;
-//
-//	if (compat_get_timespec64(&t, rqtp))
-//		return -EFAULT;
-//
-//	if (!timespec64_valid(&t))
-//		return -EINVAL;
-//	if (flags & TIMER_ABSTIME)
-//		rmtp = NULL;
-//	current->restart_block.fn = do_no_restart_syscall;
-//	current->restart_block.nanosleep.type = rmtp ? TT_COMPAT : TT_NONE;
-//	current->restart_block.nanosleep.compat_rmtp = rmtp;
-//
-//	return kc->nsleep(which_clock, flags, &t);
-//}
+COMPAT_SYSCALL_DEFINE4(clock_nanosleep, clockid_t, which_clock, int, flags,
+		       struct compat_timespec __user *, rqtp,
+		       struct compat_timespec __user *, rmtp)
+{
+	const struct k_clock *kc = clockid_to_kclock(which_clock);
+	struct timespec64 t;
+
+	if (!kc)
+		return -EINVAL;
+	if (!kc->nsleep)
+		return -ENANOSLEEP_NOTSUP;
+
+	if (compat_get_timespec64(&t, rqtp))
+		return -EFAULT;
+
+	if (!timespec64_valid(&t))
+		return -EINVAL;
+	if (flags & TIMER_ABSTIME)
+		rmtp = NULL;
+	current->restart_block.fn = do_no_restart_syscall;
+	current->restart_block.nanosleep.type = rmtp ? TT_COMPAT : TT_NONE;
+	current->restart_block.nanosleep.compat_rmtp = rmtp;
+
+	return kc->nsleep(which_clock, flags, &t);
+}
 #endif
 
 static const struct k_clock clock_realtime = {
