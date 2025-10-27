@@ -22,7 +22,7 @@
 				trip = <&pmi632_trip0>;
 				cooling-device =
 					<&pmi632_charger THERMAL_LIMIT_MINUS_1
-						THERMAL_LIMIT_MINUS_1)>;
+						THERMAL_LIMIT_MINUS_1>;
 			};
 			trip1_bat {
 				trip = <&pmi632_trip1>;
