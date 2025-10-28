@@ -1,3 +1,4 @@
+dtb-y += qcom-base/trinket.dtb
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 
 dtbo-$(CONFIG_MACH_XIAOMI_C3J) += \
@@ -13,9 +14,14 @@ endif
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
 
-$(obj)/%.dtbo:$(src)/../../../../arm64/boot/dts/xiaomi/%.dts FORCE
+$(obj)/%.dtbo: $(src)/../../../../arm64/boot/dts/xiaomi/%.dts FORCE
 	$(call if_changed_dep,dtc)
 	$(call if_changed,dtbo_verify)
 
 dtbs: $(addprefix $(obj)/,$(dtb-y)) $(addprefix $(obj)/,$(dtbo-y))
 clean-files	:= *.dtb *.dtbo
+
+# --- Added rule to create .dtbo.dtb copy ---
+$(obj)/ginkgo-trinket-overlay.dtbo.dtb: $(obj)/ginkgo-trinket-overlay.dtbo
+	@echo "  COPY    $@"
+	@cp $< $@
